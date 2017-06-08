@@ -132,4 +132,30 @@ class TemplatingTest extends \PHPUnit_Framework_TestCase {
 		return $templating->render( $template, $data, $filters );
 	}
 
+	/**
+	 * @todo Cover following cases
+	 *
+	 * Valid template:
+	 * <div>
+	 * 		<div v-if="condition">if body</div>
+	 * 		<div v-else>else body</div>
+	 * </div>
+	 *
+	 * Invalid template [Error compiling template: v-else used on element <div> without corresponding v-if]:
+	 * <div>
+	 * 		<div v-if="condition">if body</div>
+	 * 		<span>something</span>
+	 * 		<div v-else>else body</div>
+	 * </div>
+	 *
+	 * Invalid template [Error compiling template: v-else used on element <div> without corresponding v-if]:
+	 * <div>
+	 * 		<div v-if="condition">if body</div>
+	 * 		<div>
+	 * 			<div v-else>else body</div>
+	 * 		</div>
+	 * </div>
+	 *
+	 */
+
 }
