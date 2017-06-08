@@ -82,7 +82,15 @@ class TemplatingTest extends \PHPUnit_Framework_TestCase {
 	 * @test
 	 */
 	public function templateWithMustacheFilter_ReplacesVariableWithGivenCallbackReturnValue() {
-		$result = $this->createAndRender( "<p>{{'ABC'|message}}</p>", [], [ 'message' => function(  $value ){ return "some $value message"; } ] );
+		$result = $this->createAndRender(
+			"<p>{{'ABC'|message}}</p>",
+			[],
+			[
+				'message' => function ( $value ) {
+					return "some $value message";
+				}
+			]
+		);
 
 		assertThat( $result, is( equalTo( '<p>some ABC message</p>' ) ) );
 	}
@@ -91,7 +99,7 @@ class TemplatingTest extends \PHPUnit_Framework_TestCase {
 	 * @test
 	 */
 	public function templateWithTruthfulConditionInIf_IsNotRemoved() {
-		$result = $this->createAndRender( '<p><a v-if="variable"></a></p>', [  'variable' => true] );
+		$result = $this->createAndRender( '<p><a v-if="variable"></a></p>', [ 'variable' => true ] );
 
 		assertThat( $result, is( equalTo( '<p><a></a></p>' ) ) );
 	}
@@ -100,7 +108,7 @@ class TemplatingTest extends \PHPUnit_Framework_TestCase {
 	 * @test
 	 */
 	public function templateWithUntruthfulConditionInIf_IsRemoved() {
-		$result = $this->createAndRender( '<p><a v-if="variable"></a></p>', [  'variable' => false] );
+		$result = $this->createAndRender( '<p><a v-if="variable"></a></p>', [ 'variable' => false ] );
 
 		assertThat( $result, is( equalTo( '<p></p>' ) ) );
 	}
@@ -109,11 +117,10 @@ class TemplatingTest extends \PHPUnit_Framework_TestCase {
 	 * @test
 	 */
 	public function templateWithNegatedFalseInIf_IsNotRemoved() {
-		$result = $this->createAndRender( '<p><a v-if="!variable"></a></p>', [  'variable' => false] );
+		$result = $this->createAndRender( '<p><a v-if="!variable"></a></p>', [ 'variable' => false ] );
 
 		assertThat( $result, is( equalTo( '<p><a></a></p>' ) ) );
 	}
-
 
 	/**
 	 * @param $template

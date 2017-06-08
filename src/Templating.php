@@ -78,7 +78,7 @@ class Templating {
 	 * @param $data
 	 */
 	private function replaceMustacheVariables( \DOMNode $node, array $data ) {
-		if( $node instanceof \DOMText ) {
+		if ( $node instanceof \DOMText ) {
 			$text = $node->wholeText;
 			foreach ( $data as $key => $value ) {
 				$text = str_replace( '{{' . $key . '}}', $value, $text );
@@ -96,7 +96,6 @@ class Templating {
 		}
 	}
 
-
 	/**
 	 * @param $node
 	 * @param $filters
@@ -104,13 +103,13 @@ class Templating {
 	private function replaceMustacheFilters( \DOMNode $node, array $filters ) {
 		$regex = '/\{\{\'([^\']*)\'\|(\w+)\}\}/';
 
-		if( $node instanceof \DOMText ) {
+		if ( $node instanceof \DOMText ) {
 			$text = $node->wholeText;
-			if( preg_match_all( $regex, $node->wholeText, $matches ) > 0 ) {
+			if ( preg_match_all( $regex, $node->wholeText, $matches ) > 0 ) {
 				foreach ( $matches[2] as $index => $filterName ) {
 					$value = $matches[1][$index];
 					$textToReplace = $matches[0][$index];
-					$text = str_replace( $textToReplace, $filters[$filterName]($value), $text );
+					$text = str_replace( $textToReplace, $filters[$filterName]( $value ), $text );
 				}
 			}
 
@@ -127,8 +126,6 @@ class Templating {
 		}
 	}
 
-
-
 	/**
 	 * @param $node
 	 * @param $data
@@ -141,10 +138,10 @@ class Templating {
 		/** @var \DOMAttr $attribute */
 		/** @var \DOMElement $node */
 		foreach ( $node->attributes as $attribute ) {
-			if ( $attribute->name === 'v-if'  ) {
+			if ( $attribute->name === 'v-if' ) {
 				$node->removeAttribute( $attribute->name );
 				$variableName = $attribute->value;
-				if (strpos( $variableName, '!') === 0) {
+				if ( strpos( $variableName, '!' ) === 0 ) {
 					$variableName = substr( $variableName, 1 );
 					$condition = !$data[$variableName];
 				} else {
