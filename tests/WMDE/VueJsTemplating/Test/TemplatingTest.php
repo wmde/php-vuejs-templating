@@ -141,6 +141,13 @@ class TemplatingTest extends \PHPUnit_Framework_TestCase {
 	 * 		<div v-else>else body</div>
 	 * </div>
 	 *
+	 * Valid template:
+	 * <div>
+	 * 		<div v-if="condition == 1">if body</div>
+	 * 		<div v-else-if="condition == 2">v-else-if body</div>
+	 * 		<div v-else>else body</div>
+	 * </div>
+	 *
 	 * Invalid template [Error compiling template: v-else used on element <div> without corresponding v-if]:
 	 * <div>
 	 * 		<div v-if="condition">if body</div>
@@ -154,6 +161,13 @@ class TemplatingTest extends \PHPUnit_Framework_TestCase {
 	 * 		<div>
 	 * 			<div v-else>else body</div>
 	 * 		</div>
+	 * </div>
+	 *
+	 * Invalid template [Error compiling template: text "something" between v-if and v-else(-if) will be ignored.]:
+	 * <div>
+	 * 		<div v-if="condition">if body</div>
+	 * 		something
+	 * 		<div v-else>else body</div>
 	 * </div>
 	 *
 	 */
