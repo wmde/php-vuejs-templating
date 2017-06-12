@@ -11,7 +11,7 @@ class Templating {
 		$this->stripEventHandlers( $rootNode );
 		$this->replaceMustacheVariables( $rootNode, $data );
 		$this->replaceMustacheFilters( $rootNode, $filters );
-		$this->handleIf( $rootNode, $data );
+		$this->handleIf( $rootNode->childNodes, $data );
 
 		return $document->saveHTML( $rootNode );
 	}
@@ -130,33 +130,35 @@ class Templating {
 	 * @param $node
 	 * @param $data
 	 */
-	private function handleIf( \DOMNode $node, array $data ) {
-		if ( $node instanceof \DOMCharacterData ) {
-			return;
-		}
+	private function handleIf( \DOMNodeList $nodes, array $data ) {
+		foreach ( $nodes as $node ) {
+			if ( $node instanceof \DOMCharacterData ) {
+				continue;
+			}
 
-		/** @var \DOMAttr $attribute */
-		/** @var \DOMElement $node */
-		foreach ( $node->attributes as $attribute ) {
-			if ( $attribute->name === 'v-if' ) {
-				$node->removeAttribute( $attribute->name );
-				$variableName = $attribute->value;
-				if ( strpos( $variableName, '!' ) === 0 ) {
-					$variableName = substr( $variableName, 1 );
-					$condition = !$data[$variableName];
-				} else {
-					$condition = $data[$variableName];
-				}
+			/** @var \DOMAttr $attribute */
+			/** @var \DOMElement $node */
+			foreach ( $node->attributes as $attribute ) {
+				if ( $attribute->name === 'v-if' ) {
+					$node->removeAttribute( $attribute->name );
+					$variableName = $attribute->value;
+					if ( strpos( $variableName, '!' ) === 0 ) {
+						$variableName = substr( $variableName, 1 );
+						$condition = !$data[$variableName];
+					} else {
+						$condition = $data[$variableName];
+					}
 
-				if ( !$condition ) {
-					$node->parentNode->removeChild( $node );
+					if ( !$condition ) {
+						$node->parentNode->removeChild( $node );
+					}
 				}
 			}
+
+			$this->handleIf( $node->childNodes, $data );
 		}
 
-		foreach ( $node->childNodes as $childNode ) {
-			$this->handleIf( $childNode, $data );
-		}
 	}
+
 
 }

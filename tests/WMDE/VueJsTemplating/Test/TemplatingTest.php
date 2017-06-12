@@ -123,6 +123,16 @@ class TemplatingTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
+	 * @test
+	 */
+	public function templateWithIfElseBlockAndTruthfulCondition_ElseIsRemoved() {
+		$this->markTestSkipped( 'Not implemented yet' );
+		$result = $this->createAndRender( '<p><a v-if="variable">if</a><a v-else>else</a></p>', [ 'variable' => true ] );
+
+		assertThat( $result, is( equalTo( '<p><a>if</a></p>' ) ) );
+	}
+
+	/**
 	 * @param $template
 	 * @param $data
 	 * @return string
