@@ -62,7 +62,7 @@ class Templating {
 		if ( !$this->isTextNode( $node ) ) {
 			$this->stripEventHandlers( $node );
 			$this->handleIf( $node->childNodes, $data );
-			$this->handleFor( $node, $data );
+			$this->handleFor( $node, $data, $filters );
 
 			foreach ( $node->childNodes as $childNode ) {
 				$this->handleNode( $childNode, $data, $filters );
@@ -93,7 +93,10 @@ class Templating {
 		if ( $node instanceof \DOMText ) {
 			$text = $node->wholeText;
 			foreach ( $data as $key => $value ) {
-				$text = str_replace( '{{' . $key . '}}', $value, $text );
+				$mustacheExpr = '{{' . $key . '}}';
+				if ( strpos( $text, $mustacheExpr) !== false ) {
+					$text = str_replace( $mustacheExpr, $value, $text );
+				}
 			}
 			if ( $text !== $node->wholeText ) {
 				$newNode = $node->ownerDocument->createTextNode( $text );
@@ -163,7 +166,7 @@ class Templating {
 
 	}
 
-	private function handleFor( \DOMNode $node, $data ) {
+	private function handleFor( \DOMNode $node, array $data, array $filters ) {
 		if ( $this->isTextNode( $node ) ) {
 			return;
 		}
@@ -174,8 +177,9 @@ class Templating {
 			$node->removeAttribute( 'v-for' );
 
 			foreach ( $data[$listName] as $item ) {
-				$newNode = $node->cloneNode( false ); //TODO: Test `false` or `true`.
+				$newNode = $node->cloneNode( true );
 				$node->parentNode->insertBefore( $newNode, $node );
+				$this->handleNode( $newNode, array_merge( $data, [ $itemName => $item ] ), $filters );
 			}
 
 			$this->removeNode( $node );

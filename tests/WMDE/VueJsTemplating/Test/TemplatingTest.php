@@ -168,6 +168,15 @@ class TemplatingTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
+	 * @test
+	 */
+	public function templateWithForLoopMustache_RendersCorrectValues() {
+		$result = $this->createAndRender( '<p><a v-for="item in list">{{item}}</a></p>', [ 'list' => [ 1, 2 ] ] );
+
+		assertThat( $result, is( equalTo( '<p><a>1</a><a>2</a></p>' ) ) );
+	}
+
+	/**
 	 * @param $template
 	 * @param $data
 	 * @return string
