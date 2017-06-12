@@ -135,23 +135,14 @@ class Templating {
 			if ( $node instanceof \DOMCharacterData ) {
 				continue;
 			}
-
-			/** @var \DOMAttr $attribute */
 			/** @var \DOMElement $node */
-			foreach ( $node->attributes as $attribute ) {
-				if ( $attribute->name === 'v-if' ) {
-					$node->removeAttribute( $attribute->name );
-					$variableName = $attribute->value;
-					if ( strpos( $variableName, '!' ) === 0 ) {
-						$variableName = substr( $variableName, 1 );
-						$condition = !$data[$variableName];
-					} else {
-						$condition = $data[$variableName];
-					}
+			if ( $node->hasAttribute( 'v-if' ) ) {
+				$conditionString = $node->getAttribute('v-if');
+				$node->removeAttribute( 'v-if' );
+				$condition = $this->evaluateCondition( $conditionString, $data );
 
-					if ( !$condition ) {
-						$node->parentNode->removeChild( $node );
-					}
+				if ( !$condition ) {
+					$this->removeNode( $node );
 				}
 			}
 
@@ -160,5 +151,24 @@ class Templating {
 
 	}
 
+	/**
+	 * @param string $conditionString
+	 * @param array $data
+	 * @return bool
+	 */
+	private function evaluateCondition( $conditionString, array $data ) {
+		if ( strpos( $conditionString, '!' ) === 0 ) {
+			$conditionString = substr( $conditionString, 1 );
+			$condition = !$data[$conditionString];
+		} else {
+			$condition = $data[$conditionString];
+		}
+
+		return (bool)$condition;
+	}
+
+	private function removeNode( \DOMElement $node ) {
+		$node->parentNode->removeChild( $node );
+	}
 
 }
