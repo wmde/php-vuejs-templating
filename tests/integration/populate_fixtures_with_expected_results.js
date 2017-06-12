@@ -23,7 +23,8 @@ readFixtureDir().then( function ( files ) {
 function extractDataFromFixture( html ) {
 	const $ = cheerio.load( html );
 
-	const template = $( '#template' ).html().trim();
+	const template = $( '#template' ).html().trim().replace(/\&apos;/g, "'"); //Replacing '&apos;' as soon as Vue can't handle it
+	console.log( template );
 	const data = JSON.parse( $( '#data' ).html() );
 
 	return { template: template, data: data };

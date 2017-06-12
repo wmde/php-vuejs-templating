@@ -1,0 +1,43 @@
+<template id="template" type="text/x-template">
+    <div class="lemma-widget">
+        <ul v-if="!inEditMode" class="lemma-widget_lemma-list">
+            <li v-for="lemma in lemmas" class="lemma-widget_lemma">
+                <span class="lemma-widget_lemma-value">{{lemma.value}}</span>
+                <span class="lemma-widget_lemma-language">{{lemma.language}}</span>
+            </li>
+        </ul>
+        <div v-else="">
+            <div class="lemma-widget_edit-area">
+                <ul class="lemma-widget_lemma-list">
+                    <li v-for="lemma in lemmas" class="lemma-widget_lemma-edit-box">
+                        <input size="1" class="lemma-widget_lemma-value-input" v-model="lemma.value" :disabled="isSaving">
+                        <input size="1" class="lemma-widget_lemma-language-input" v-model="lemma.language" :disabled="isSaving">
+                        <button class="lemma-widget_lemma-remove" v-on:click="remove(lemma)" :disabled="isSaving" :title="&apos;wikibase-remove&apos;|message">
+                            &#xD7;
+                        </button>
+                    </li>
+                    <li>
+                        <button type="button" class="lemma-widget_add" v-on:click="add" :disabled="isSaving" :title="&apos;wikibase-add&apos;|message">+</button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="lemma-widget_controls">
+            <button type="button" class="lemma-widget_control" v-if="!inEditMode" :disabled="isSaving" v-on:click="edit">{{&apos;wikibase-edit&apos;|message}}</button>
+            <button type="button" class="lemma-widget_control" v-if="inEditMode" :disabled="isSaving" v-on:click="save">{{&apos;wikibase-save&apos;|message}}</button>
+            <button type="button" class="lemma-widget_control" v-if="inEditMode" :disabled="isSaving" v-on:click="cancel">{{&apos;wikibase-cancel&apos;|message}}</button>
+        </div>
+    </div>
+</template>
+<script id="data" type="application/json">
+    {
+        "inEditMode":false,
+        "isSaving":false,
+        "lemmas": [
+            {"value": "lemma1", "language":"en"},
+            {"value": "lemma2", "language":"fr"}
+        ]
+    }
+</script>
+
+<div id="result"><div class="lemma-widget"><ul class="lemma-widget_lemma-list"><li class="lemma-widget_lemma"><span class="lemma-widget_lemma-value">lemma1</span> <span class="lemma-widget_lemma-language">en</span></li><li class="lemma-widget_lemma"><span class="lemma-widget_lemma-value">lemma2</span> <span class="lemma-widget_lemma-language">fr</span></li></ul> <div class="lemma-widget_controls"><button type="button" class="lemma-widget_control">wikibase-edit</button> <!----> <!----></div></div></div>

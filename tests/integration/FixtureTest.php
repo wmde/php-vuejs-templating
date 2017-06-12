@@ -12,9 +12,13 @@ class FixtureTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function fixtureTest($template, $data, $expectedResult) {
 		$templating = new Templating();
+		$filters = [
+			'message' => 'strval'
+		];
 
-		$result = $templating->render( $template, $data );
+		$result = $templating->render( $template, $data, $filters );
 
+		//TODO Smarter html assertions
 		assertThat( $result, is( equalTo( $expectedResult ) ) );
 	}
 
