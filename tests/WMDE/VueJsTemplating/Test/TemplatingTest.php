@@ -177,6 +177,33 @@ class TemplatingTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
+	 * @test
+	 */
+	public function templateWithAttributeBinding_ConditionIsFalse_AttributeIsNotRendered() {
+		$result = $this->createAndRender( '<p :attr1="condition"></p>', [ 'condition' => false ] );
+
+		assertThat( $result, is( equalTo( '<p></p>' ) ) );
+	}
+
+	/**
+	 * @test
+	 */
+	public function templateWithAttributeBinding_ConditionIsTrue_AttributeIsRendered() {
+		$result = $this->createAndRender( '<p :disabled="condition"></p>', [ 'condition' => true ] );
+
+		assertThat( $result, is( equalTo( '<p disabled></p>' ) ) );
+	}
+
+	/**
+	 * @test
+	 */
+	public function templateWithAttributeBinding_ConditionIsString_AttributeIsRenderedWithThatString() {
+		$result = $this->createAndRender( '<p :attr1="condition"></p>', [ 'condition' => 'some string' ] );
+
+		assertThat( $result, is( equalTo( '<p attr1="some string"></p>' ) ) );
+	}
+
+	/**
 	 * @param $template
 	 * @param $data
 	 * @return string

@@ -61,6 +61,7 @@ class Templating {
 		$this->replaceMustacheFilters( $node, $filters );
 		if ( !$this->isTextNode( $node ) ) {
 			$this->stripEventHandlers( $node );
+			$this->handleAttributeBinding( $node, $data, $filters );
 			$this->handleIf( $node->childNodes, $data );
 			$this->handleFor( $node, $data, $filters );
 
@@ -126,6 +127,27 @@ class Templating {
 				$newNode = $node->ownerDocument->createTextNode( $text );
 				$node->parentNode->replaceChild( $newNode, $node );
 			}
+		}
+	}
+
+	private function handleAttributeBinding( \DOMElement $node, array $data, array $filters ) {
+		/** @var \DOMAttr $attribute */
+		foreach ( $node->attributes as $attribute ) {
+			if ( !preg_match( '/^:[\-\_\w\d]+$/', $attribute->name ) ) {
+				continue;
+			}
+
+			$expression = $this->evaluateCondition( $attribute->value, $data );
+			$name = substr( $attribute->name, 1 );
+			if ( is_bool( $expression ) ) {
+				if ( $expression ) {
+					$node->setAttribute( $name, $name );
+				}
+			} else {
+				$node->setAttribute( $name, $expression );
+			}
+
+			$node->removeAttribute( $attribute->name );
 		}
 	}
 
@@ -199,7 +221,7 @@ class Templating {
 			$condition = $data[$conditionString];
 		}
 
-		return (bool)$condition;
+		return $condition;
 	}
 
 	private function removeNode( \DOMElement $node ) {
