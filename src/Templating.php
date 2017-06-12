@@ -8,11 +8,7 @@ class Templating {
 		$document = $this->parseHtml( $template );
 
 		$rootNode = $this->getRootNode( $document );
-		$this->stripEventHandlers( $rootNode );
-		$this->replaceMustacheVariables( $rootNode, $data );
-		$this->replaceMustacheFilters( $rootNode, $filters );
-		$this->handleIf( $rootNode->childNodes, $data );
-		$this->handleFor( $rootNode, $data );
+		$this->handleNode( $rootNode, $data, $filters );
 
 		return $document->saveHTML( $rootNode );
 	}
@@ -56,6 +52,25 @@ class Templating {
 	}
 
 	/**
+	 * @param $rootNode
+	 * @param array $data
+	 * @param array $filters
+	 */
+	private function handleNode( \DOMNode $node, array $data, array $filters ) {
+		$this->replaceMustacheVariables( $node, $data );
+		$this->replaceMustacheFilters( $node, $filters );
+		if ( !$this->isTextNode( $node ) ) {
+			$this->stripEventHandlers( $node );
+			$this->handleIf( $node->childNodes, $data );
+			$this->handleFor( $node, $data );
+
+			foreach ( $node->childNodes as $childNode ) {
+				$this->handleNode( $childNode, $data, $filters );
+			}
+		}
+	}
+
+	/**
 	 * @param $node
 	 */
 	private function stripEventHandlers( \DOMNode $node ) {
@@ -67,10 +82,6 @@ class Templating {
 			if ( strpos( $attribute->name, 'v-on:' ) === 0 ) {
 				$node->removeAttribute( $attribute->name );
 			}
-		}
-
-		foreach ( $node->childNodes as $childNode ) {
-			$this->stripEventHandlers( $childNode );
 		}
 	}
 
@@ -84,16 +95,10 @@ class Templating {
 			foreach ( $data as $key => $value ) {
 				$text = str_replace( '{{' . $key . '}}', $value, $text );
 			}
-			$newNode = $node->ownerDocument->createTextNode( $text );
-			$node->parentNode->replaceChild( $newNode, $node );
-		}
-
-		if ( $this->isTextNode( $node ) ) {
-			return;
-		}
-
-		foreach ( $node->childNodes as $childNode ) {
-			$this->replaceMustacheVariables( $childNode, $data );
+			if ( $text !== $node->wholeText ) {
+				$newNode = $node->ownerDocument->createTextNode( $text );
+				$node->parentNode->replaceChild( $newNode, $node );
+			}
 		}
 	}
 
@@ -114,16 +119,10 @@ class Templating {
 				}
 			}
 
-			$newNode = $node->ownerDocument->createTextNode( $text );
-			$node->parentNode->replaceChild( $newNode, $node );
-		}
-
-		if ( $node instanceof \DOMCharacterData ) {
-			return;
-		}
-
-		foreach ( $node->childNodes as $childNode ) {
-			$this->replaceMustacheFilters( $childNode, $filters );
+			if ( $text !== $node->wholeText ) {
+				$newNode = $node->ownerDocument->createTextNode( $text );
+				$node->parentNode->replaceChild( $newNode, $node );
+			}
 		}
 	}
 
@@ -146,8 +145,6 @@ class Templating {
 
 				if ( !$condition ) {
 					$nodesToRemove[] = $node;
-				} else {
-					$this->handleIf( $node->childNodes, $data );
 				}
 
 				$previousIfCondition = $condition;
@@ -156,8 +153,6 @@ class Templating {
 				$node->removeAttribute( 'v-else' );
 				if ( $previousIfCondition ) {
 					$nodesToRemove[] = $node;
-				} else {
-					$this->handleIf( $node->childNodes, $data );
 				}
 			}
 		}
@@ -184,10 +179,6 @@ class Templating {
 			}
 
 			$this->removeNode( $node );
-		}
-
-		foreach ( $node->childNodes as $node ) {
-			$this->handleFor( $node, $data );
 		}
 	}
 
