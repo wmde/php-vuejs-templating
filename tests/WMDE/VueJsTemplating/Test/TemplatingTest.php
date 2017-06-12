@@ -141,6 +141,33 @@ class TemplatingTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
+	 * @test
+	 */
+	public function templateWithForLoopAndEmptyArrayToIterate_NotRendered() {
+		$result = $this->createAndRender( '<p><a v-for="item in list"></a></p>', [ 'list' => [] ] );
+
+		assertThat( $result, is( equalTo( '<p></p>' ) ) );
+	}
+
+	/**
+	 * @test
+	 */
+	public function templateWithForLoopAndSingleElementInArrayToIterate_RenderedOnce() {
+		$result = $this->createAndRender( '<p><a v-for="item in list"></a></p>', [ 'list' => [ 1 ] ] );
+
+		assertThat( $result, is( equalTo( '<p><a></a></p>' ) ) );
+	}
+
+	/**
+	 * @test
+	 */
+	public function templateWithForLoopAndMultipleElementsInArrayToIterate_RenderedMultipleTimes() {
+		$result = $this->createAndRender( '<p><a v-for="item in list"></a></p>', [ 'list' => [ 1, 2 ] ] );
+
+		assertThat( $result, is( equalTo( '<p><a></a><a></a></p>' ) ) );
+	}
+
+	/**
 	 * @param $template
 	 * @param $data
 	 * @return string

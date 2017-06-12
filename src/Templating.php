@@ -12,6 +12,7 @@ class Templating {
 		$this->replaceMustacheVariables( $rootNode, $data );
 		$this->replaceMustacheFilters( $rootNode, $filters );
 		$this->handleIf( $rootNode->childNodes, $data );
+		$this->handleFor( $rootNode, $data );
 
 		return $document->saveHTML( $rootNode );
 	}
@@ -58,7 +59,7 @@ class Templating {
 	 * @param $node
 	 */
 	private function stripEventHandlers( \DOMNode $node ) {
-		if ( $node instanceof \DOMCharacterData ) {
+		if ( $this->isTextNode( $node ) ) {
 			return;
 		}
 		/** @var \DOMAttr $attribute */
@@ -87,7 +88,7 @@ class Templating {
 			$node->parentNode->replaceChild( $newNode, $node );
 		}
 
-		if ( $node instanceof \DOMCharacterData ) {
+		if ( $this->isTextNode( $node ) ) {
 			return;
 		}
 
@@ -134,7 +135,7 @@ class Templating {
 		// Iteration of iterator breaks if we try to remove items while iterating, so defer node removing until finished iterating
 		$nodesToRemove = [];
 		foreach ( $nodes as $node ) {
-			if ( $node instanceof \DOMCharacterData ) {
+			if ( $this->isTextNode( $node ) ) {
 				continue;
 			}
 			/** @var \DOMElement $node */
@@ -167,6 +168,29 @@ class Templating {
 
 	}
 
+	private function handleFor( \DOMNode $node, $data ) {
+		if ( $this->isTextNode( $node ) ) {
+			return;
+		}
+
+		/** @var \DOMElement $node */
+		if ( $node->hasAttribute( 'v-for' ) ) {
+			list( $itemName, $listName ) = explode( ' in ', $node->getAttribute( 'v-for' ) );
+			$node->removeAttribute( 'v-for' );
+
+			foreach ( $data[$listName] as $item ) {
+				$newNode = $node->cloneNode( false ); //TODO: Test `false` or `true`.
+				$node->parentNode->insertBefore( $newNode, $node );
+			}
+
+			$this->removeNode( $node );
+		}
+
+		foreach ( $node->childNodes as $node ) {
+			$this->handleFor( $node, $data );
+		}
+	}
+
 	/**
 	 * @param string $conditionString
 	 * @param array $data
@@ -185,6 +209,14 @@ class Templating {
 
 	private function removeNode( \DOMElement $node ) {
 		$node->parentNode->removeChild( $node );
+	}
+
+	/**
+	 * @param $node
+	 * @return bool
+	 */
+	private function isTextNode( $node ) {
+		return $node instanceof \DOMCharacterData;
 	}
 
 }
