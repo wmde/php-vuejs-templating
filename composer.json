@@ -16,7 +16,8 @@
   },
   "autoload-dev": {
     "psr-4": {
-      "WMDE\\VueJsTemplating\\Test\\": "tests"
+      "WMDE\\VueJsTemplating\\IntegrationTest\\": "tests/integration",
+      "WMDE\\VueJsTemplating\\Test\\": "tests/php"
     },
     "files": [
       "vendor/hamcrest/hamcrest-php/hamcrest/Hamcrest.php",
