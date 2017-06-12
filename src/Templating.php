@@ -131,6 +131,8 @@ class Templating {
 	 * @param $data
 	 */
 	private function handleIf( \DOMNodeList $nodes, array $data ) {
+		// Iteration of iterator breaks if we try to remove items while iterating, so defer node removing until finished iterating
+		$nodesToRemove = [];
 		foreach ( $nodes as $node ) {
 			if ( $node instanceof \DOMCharacterData ) {
 				continue;
@@ -142,11 +144,25 @@ class Templating {
 				$condition = $this->evaluateCondition( $conditionString, $data );
 
 				if ( !$condition ) {
-					$this->removeNode( $node );
+					$nodesToRemove[] = $node;
+				} else {
+					$this->handleIf( $node->childNodes, $data );
+				}
+
+				$previousIfCondition = $condition;
+
+			} elseif ( $node->hasAttribute( 'v-else' ) ) {
+				$node->removeAttribute( 'v-else' );
+				if ( $previousIfCondition ) {
+					$nodesToRemove[] = $node;
+				} else {
+					$this->handleIf( $node->childNodes, $data );
 				}
 			}
+		}
 
-			$this->handleIf( $node->childNodes, $data );
+		foreach ( $nodesToRemove as $node ) {
+			$this->removeNode( $node );
 		}
 
 	}
