@@ -135,7 +135,7 @@ class TemplatingTest extends \PHPUnit_Framework_TestCase {
 	 * @test
 	 */
 	public function templateWithIfElseBlockAndNontruthfulCondition_ElseIsDisplayed() {
-		$result = $this->createAndRender( '<p><a v-if="variable">if</a><a v-else="">else</a></p>', [ 'variable' => false ] );
+		$result = $this->createAndRender( '<p><a v-if="variable">if</a><a v-else>else</a></p>', [ 'variable' => false ] );
 
 		assertThat( $result, is( equalTo( '<p><a>else</a></p>' ) ) );
 	}
