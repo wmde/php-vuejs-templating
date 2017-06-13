@@ -130,6 +130,8 @@ class Component {
 					$value = $data[$expression];
 				}
 
+				$value = $this->evaluateExpression( $expression, $data );
+
 				$filterIsSet = !empty( $matches['filterName'][$index] );
 				if ( $filterIsSet ) {
 					$filterName = $matches['filterName'][$index];
@@ -154,7 +156,7 @@ class Component {
 				continue;
 			}
 
-			$expression = $this->evaluateCondition( $attribute->value, $data );
+			$expression = $this->evaluateExpression( $attribute->value, $data );
 			$name = substr( $attribute->name, 1 );
 			if ( is_bool( $expression ) ) {
 				if ( $expression ) {
@@ -183,7 +185,7 @@ class Component {
 			if ( $node->hasAttribute( 'v-if' ) ) {
 				$conditionString = $node->getAttribute( 'v-if' );
 				$node->removeAttribute( 'v-if' );
-				$condition = $this->evaluateCondition( $conditionString, $data );
+				$condition = $this->evaluateExpression( $conditionString, $data );
 
 				if ( !$condition ) {
 					$nodesToRemove[] = $node;
@@ -226,19 +228,21 @@ class Component {
 	}
 
 	/**
-	 * @param string $conditionString
+	 * @param string $expression
 	 * @param array $data
 	 * @return bool
 	 */
-	private function evaluateCondition( $conditionString, array $data ) {
-		if ( strpos( $conditionString, '!' ) === 0 ) {
-			$conditionString = substr( $conditionString, 1 );
-			$condition = !$data[$conditionString];
-		} else {
-			$condition = $data[$conditionString];
+	private function evaluateExpression( $expression, array $data ) {
+		if ( strpos( $expression, '!' ) === 0 ) { // ! operator application
+			$expression = substr( $expression, 1 );
+			$value = !$this->evaluateExpression( $expression, $data);
+		} else if (strpos( $expression, "'") === 0) { // string evaluation
+			$value = substr( $expression, 1, strlen( $expression ) - 2 );
+		} else { // variable evaluation
+			$value = $data[$expression];
 		}
 
-		return $condition;
+		return $value;
 	}
 
 	private function removeNode( \DOMElement $node ) {
