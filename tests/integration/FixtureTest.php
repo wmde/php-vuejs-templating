@@ -18,8 +18,7 @@ class FixtureTest extends \PHPUnit_Framework_TestCase {
 
 		$result = $templating->render( $template, $data, $filters );
 
-		//TODO Smarter html assertions
-		assertThat( $result, is( equalTo( $expectedResult ) ) );
+		$this->assertEqualHtml( $expectedResult, $result );
 	}
 
 	public function provideFixtures() {
@@ -62,5 +61,27 @@ class FixtureTest extends \PHPUnit_Framework_TestCase {
 	 */
 	private function getContents( $DOMDocument, $elementId ) {
 		return $DOMDocument->saveHTML( $DOMDocument->getElementById( $elementId )->childNodes->item( 0 ) );
+	}
+
+	/**
+	 * @param $expectedResult
+	 * @param $result
+	 */
+	private function assertEqualHtml( $expectedResult, $result ) {
+		$expectedResult = $this->normalizeHtml( $expectedResult );
+		$result = $this->normalizeHtml( $result );
+
+
+		$this->assertEquals( $expectedResult, $result );
+	}
+
+	/**
+	 * @param $html
+	 */
+	private function normalizeHtml( $html ) {
+		$html = preg_replace( '/<!--.*?-->/', '', $html );
+		$html = preg_replace( '/\s+/', ' ', $html );
+		$html = str_replace( '> ', ">\n", $html );
+		return $html;
 	}
 }
