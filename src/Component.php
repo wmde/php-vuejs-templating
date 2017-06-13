@@ -87,8 +87,10 @@ class Component {
 			$this->handleIf( $node->childNodes, $data );
 			$this->handleFor( $node, $data, $filters );
 
-			foreach ( $node->childNodes as $childNode ) {
-				$this->handleNode( $childNode, $data );
+			if ( !$this->isRemovedFromTheDom( $node ) ) {
+				foreach ( $node->childNodes as $childNode ) {
+					$this->handleNode( $childNode, $data );
+				}
 			}
 		}
 	}
@@ -115,11 +117,12 @@ class Component {
 	private function replaceMustacheVariables( \DOMNode $node, array $data ) {
 		if ( $node instanceof \DOMText ) {
 			$text = $node->wholeText;
-			foreach ( $data as $key => $value ) {
-				$mustacheExpr = '{{' . $key . '}}';
-				if ( strpos( $text, $mustacheExpr ) !== false ) {
-					$text = str_replace( $mustacheExpr, $value, $text );
-				}
+
+			$regex = '/\{\{(.*?)\}\}/';
+			preg_match_all( $regex, $text, $matches );
+
+			foreach ( $matches[1] as $index => $varName ) {
+				$text = str_replace( $matches[0][$index], $data[$varName], $text );
 			}
 			if ( $text !== $node->wholeText ) {
 				$newNode = $node->ownerDocument->createTextNode( $text );
@@ -258,6 +261,10 @@ class Component {
 	 */
 	private function isTextNode( $node ) {
 		return $node instanceof \DOMCharacterData;
+	}
+
+	private function isRemovedFromTheDom( \DOMNode $node ) {
+		return $node->parentNode === null;
 	}
 
 }

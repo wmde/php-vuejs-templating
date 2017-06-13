@@ -198,9 +198,20 @@ class TemplatingTest extends \PHPUnit_Framework_TestCase {
 	 * @test
 	 */
 	public function templateWithAttributeBinding_ConditionIsString_AttributeIsRenderedWithThatString() {
+		//TODO Rename variable name
 		$result = $this->createAndRender( '<p :attr1="condition"></p>', [ 'condition' => 'some string' ] );
 
 		assertThat( $result, is( equalTo( '<p attr1="some string"></p>' ) ) );
+	}
+
+	/**
+	 * @test
+	 */
+	public function templateWithPropertyAccessInMustache_CorrectValueIsRendered() {
+		$this->markTestSkipped();
+		$result = $this->createAndRender( '<p>{{var.property}}</p>', [ 'var' => ['property' => 'value'] ] );
+
+		assertThat( $result, is( equalTo( '<p>value</p>' ) ) );
 	}
 
 	/**
