@@ -98,10 +98,10 @@ function saveResultToFile(filePath, renderResult) {
 	readFile(filePath).then(function (html) {
 		const $ = cheerio.load( html );
 		$('#result').remove();
-		const $resultElement = $( '<div id="result"></div>' ).html( renderResult );
-		$.root().append( $resultElement );
+		const $resultElement = $( '<div id="result"></div>' ).html( "\n\t" + renderResult + "\n" );
+		$.root().children().last().after( $resultElement ).after("\n");
 
-		return saveFile( filePath, $.html() );
+		return saveFile( filePath, $.html().trim() + "\n" );
 	})
 
 }
