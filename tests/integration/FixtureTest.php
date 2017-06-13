@@ -10,7 +10,7 @@ class FixtureTest extends \PHPUnit_Framework_TestCase {
 	 * @test
 	 * @dataProvider provideFixtures
 	 */
-	public function fixtureTest($template, $data, $expectedResult) {
+	public function phpRenderingEqualsVueJsRendering($template, $data, $expectedResult) {
 		$templating = new Templating();
 		$filters = [
 			'message' => 'strval'
