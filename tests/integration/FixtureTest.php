@@ -60,7 +60,18 @@ class FixtureTest extends \PHPUnit_Framework_TestCase {
 	 * @return mixed
 	 */
 	private function getContents( $DOMDocument, $elementId ) {
-		return $DOMDocument->saveHTML( $DOMDocument->getElementById( $elementId )->childNodes->item( 0 ) );
+		return $this->getInnerHtml( $DOMDocument->getElementById( $elementId ) );
+	}
+
+	private function getInnerHtml( \DOMNode $element ) {
+		$innerHTML = "";
+		$children = $element->childNodes;
+
+		foreach ( $children as $child ) {
+			$innerHTML .= $element->ownerDocument->saveHTML( $child );
+		}
+
+		return $innerHTML;
 	}
 
 	/**
@@ -82,6 +93,7 @@ class FixtureTest extends \PHPUnit_Framework_TestCase {
 		$html = preg_replace( '/<!--.*?-->/', '', $html );
 		$html = preg_replace( '/\s+/', ' ', $html );
 		$html = str_replace( '> ', ">\n", $html );
+		$html = trim( $html );
 		return $html;
 	}
 }
