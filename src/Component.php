@@ -124,12 +124,6 @@ class Component {
 			preg_match_all( $regex, $text, $matches );
 
 			foreach ( $matches['expression'] as $index => $expression ) {
-				if (strpos($expression, "'") === 0) {
-					$value = substr( $expression, 1, strlen( $expression ) - 2 );
-				} else {
-					$value = $data[$expression];
-				}
-
 				$value = $this->evaluateExpression( $expression, $data );
 
 				$filterIsSet = !empty( $matches['filterName'][$index] );
@@ -239,7 +233,12 @@ class Component {
 		} else if (strpos( $expression, "'") === 0) { // string evaluation
 			$value = substr( $expression, 1, strlen( $expression ) - 2 );
 		} else { // variable evaluation
-			$value = $data[$expression];
+
+			$parts = explode( '.', $expression );
+			$value = $data;
+			foreach ($parts as $key) {
+				$value = $value[$key];
+			}
 		}
 
 		return $value;

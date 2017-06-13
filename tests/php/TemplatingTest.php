@@ -217,7 +217,6 @@ class TemplatingTest extends \PHPUnit_Framework_TestCase {
 	 * @test
 	 */
 	public function templateWithPropertyAccessInMustache_CorrectValueIsRendered() {
-		$this->markTestSkipped();
 		$result = $this->createAndRender( '<p>{{var.property}}</p>', [ 'var' => ['property' => 'value'] ] );
 
 		assertThat( $result, is( equalTo( '<p>value</p>' ) ) );
