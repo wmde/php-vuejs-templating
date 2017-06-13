@@ -80,7 +80,6 @@ class Component {
 	private function handleNode( \DOMNode $node, array $data ) {
 		$filters = $this->filters;
 		$this->replaceMustacheVariables( $node, $data );
-		$this->replaceMustacheFilters( $node);
 		if ( !$this->isTextNode( $node ) ) {
 			$this->stripEventHandlers( $node );
 			$this->handleAttributeBinding( $node, $data);
@@ -118,44 +117,35 @@ class Component {
 		if ( $node instanceof \DOMText ) {
 			$text = $node->wholeText;
 
-			$regex = '/\{\{(.*?)\}\}/';
+			$regex = '/\{\{
+							(?P<expression> [^|]*?)# var name or string literal
+							(?: \| (?P<filterName>\w+))?
+						\}\}/x';
 			preg_match_all( $regex, $text, $matches );
 
-			foreach ( $matches[1] as $index => $varName ) {
-				$text = str_replace( $matches[0][$index], $data[$varName], $text );
-			}
-			if ( $text !== $node->wholeText ) {
-				$newNode = $node->ownerDocument->createTextNode( $text );
-				$node->parentNode->replaceChild( $newNode, $node );
-			}
-		}
-	}
-
-	/**
-	 * @param $node
-	 * @param $filters
-	 */
-	private function replaceMustacheFilters( \DOMNode $node ) {
-		$filters = $this->filters;
-
-		$regex = '/\{\{\'([^\']*)\'\|(\w+)\}\}/';
-
-		if ( $node instanceof \DOMText ) {
-			$text = $node->wholeText;
-			if ( preg_match_all( $regex, $node->wholeText, $matches ) > 0 ) {
-				foreach ( $matches[2] as $index => $filterName ) {
-					$value = $matches[1][$index];
-					$textToReplace = $matches[0][$index];
-					$text = str_replace( $textToReplace, $filters[$filterName]( $value ), $text );
+			foreach ( $matches['expression'] as $index => $expression ) {
+				if (strpos($expression, "'") === 0) {
+					$value = substr( $expression, 1, strlen( $expression ) - 2 );
+				} else {
+					$value = $data[$expression];
 				}
-			}
 
+				$filterIsSet = !empty( $matches['filterName'][$index] );
+				if ( $filterIsSet ) {
+					$filterName = $matches['filterName'][$index];
+					$filter = $this->filters[$filterName];
+					$value = $filter( $value );
+				}
+
+				$text = str_replace( $matches[0][$index], $value, $text );
+			}
 			if ( $text !== $node->wholeText ) {
 				$newNode = $node->ownerDocument->createTextNode( $text );
 				$node->parentNode->replaceChild( $newNode, $node );
 			}
 		}
 	}
+
 
 	private function handleAttributeBinding( \DOMElement $node, array $data ) {
 		/** @var \DOMAttr $attribute */

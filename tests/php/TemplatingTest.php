@@ -81,6 +81,15 @@ class TemplatingTest extends \PHPUnit_Framework_TestCase {
 	/**
 	 * @test
 	 */
+	public function templateWithMustacheHavingStringLiteral_JustPrintString() {
+		$result = $this->createAndRender( "<p>before {{'string'}} after</p>", [] );
+
+		assertThat( $result, is( equalTo( '<p>before string after</p>' ) ) );
+	}
+
+	/**
+	 * @test
+	 */
 	public function templateWithMustacheFilter_ReplacesVariableWithGivenCallbackReturnValue() {
 		$result = $this->createAndRender(
 			"<p>{{'ABC'|message}}</p>",
