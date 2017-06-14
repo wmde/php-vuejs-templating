@@ -72,6 +72,14 @@ class TemplatingTest extends \PHPUnit_Framework_TestCase {
 	/**
 	 * @test
 	 */
+	public function templateWithMustacheVariable_VariableIsUndefined_ThrowsException() {
+		$this->setExpectedException( \Exception::class );
+		$this->createAndRender( '<p>{{value}}</p>', [] );
+	}
+
+	/**
+	 * @test
+	 */
 	public function templateWithMustacheVariableSurroundedByText_ReplacesVariableWithGivenValue() {
 		$result = $this->createAndRender( '<p>before {{value}} after</p>', [ 'value' => 'some value' ] );
 

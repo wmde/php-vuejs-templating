@@ -233,10 +233,12 @@ class Component {
 		} else if (strpos( $expression, "'") === 0) { // string evaluation
 			$value = substr( $expression, 1, strlen( $expression ) - 2 );
 		} else { // variable evaluation
-
 			$parts = explode( '.', $expression );
 			$value = $data;
 			foreach ($parts as $key) {
+				if ( !array_key_exists( $key, $value ) ) {
+					throw new \RuntimeException( "Undefined variable '{$expression}'" );
+				}
 				$value = $value[$key];
 			}
 		}
