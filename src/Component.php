@@ -129,6 +129,9 @@ class Component {
 				$filterIsSet = !empty( $matches['filterName'][$index] );
 				if ( $filterIsSet ) {
 					$filterName = $matches['filterName'][$index];
+					if ( !array_key_exists( $filterName, $this->filters ) ) {
+						throw new \RuntimeException( "Filter '{$filterName}' is undefined" );
+					}
 					$filter = $this->filters[$filterName];
 					$value = $filter( $value );
 				}

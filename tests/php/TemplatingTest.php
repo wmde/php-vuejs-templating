@@ -77,6 +77,15 @@ class TemplatingTest extends \PHPUnit_Framework_TestCase {
 		$this->createAndRender( '<p>{{value}}</p>', [] );
 	}
 
+
+	/**
+	 * @test
+	 */
+	public function templateWithFilter_FilterIsUndefined_ThrowsException() {
+		$this->setExpectedException( \Exception::class );
+		$this->createAndRender( '<p>{{value|nonexistentFilter}}</p>', ['value' => 'some value'] );
+	}
+
 	/**
 	 * @test
 	 */
