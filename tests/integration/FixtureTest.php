@@ -2,15 +2,20 @@
 
 namespace WMDE\VueJsTemplating\IntegrationTest;
 
+use DirectoryIterator;
+use DOMDocument;
+use DOMNode;
+use PHPUnit_Framework_TestCase;
+use RuntimeException;
 use WMDE\VueJsTemplating\Templating;
 
-class FixtureTest extends \PHPUnit_Framework_TestCase {
+class FixtureTest extends PHPUnit_Framework_TestCase {
 
 	/**
 	 * @test
 	 * @dataProvider provideFixtures
 	 */
-	public function phpRenderingEqualsVueJsRendering( $template, $data, $expectedResult ) {
+	public function phpRenderingEqualsVueJsRendering( $template, array $data, $expectedResult ) {
 		$templating = new Templating();
 		$filters = [
 			'message' => 'strval'
@@ -26,24 +31,24 @@ class FixtureTest extends \PHPUnit_Framework_TestCase {
 
 		$cases = [];
 
-		/** @var \DirectoryIterator $fileInfo */
-		foreach ( new \DirectoryIterator( $fixtureDir ) as $fileInfo ) {
+		/** @var DirectoryIterator $fileInfo */
+		foreach ( new DirectoryIterator( $fixtureDir ) as $fileInfo ) {
 			if ( $fileInfo->isDot() ) {
 				continue;
 			}
 
-			$DOMDocument = new \DOMDocument();
-			@$DOMDocument->loadHTMLFile( $fileInfo->getPathname() );
+			$document = new DOMDocument();
+			$document->loadHTMLFile( $fileInfo->getPathname() );
 
-			$template = $this->getContents( $DOMDocument, 'template' );
-			$data = json_decode( $this->getContents( $DOMDocument, 'data' ), true );
+			$template = $this->getContents( $document, 'template' );
+			$data = json_decode( $this->getContents( $document, 'data' ), true );
 			if ( json_last_error() !== JSON_ERROR_NONE ) {
-				throw new \RuntimeException(
+				throw new RuntimeException(
 					'JSON parse error: ' . json_last_error_msg() . ' in "#data" block in file ' . $fileInfo->getFilename()
 				);
 			}
 
-			$result = $this->getContents( $DOMDocument, 'result' );
+			$result = $this->getContents( $document, 'result' );
 			$cases[$fileInfo->getFilename()] = [
 				$template,
 				$data,
@@ -55,16 +60,16 @@ class FixtureTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @param $DOMDocument
-	 * @param $elementId
-	 * @return mixed
+	 * @param DOMDocument $document
+	 * @param string $elementId
+	 * @return string HTML
 	 */
-	private function getContents( $DOMDocument, $elementId ) {
-		return $this->getInnerHtml( $DOMDocument->getElementById( $elementId ) );
+	private function getContents( DOMDocument $document, $elementId ) {
+		return $this->getInnerHtml( $document->getElementById( $elementId ) );
 	}
 
-	private function getInnerHtml( \DOMNode $element ) {
-		$innerHTML = "";
+	private function getInnerHtml( DOMNode $element ) {
+		$innerHTML = '';
 		$children = $element->childNodes;
 
 		foreach ( $children as $child ) {

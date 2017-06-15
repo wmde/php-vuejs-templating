@@ -2,9 +2,11 @@
 
 namespace WMDE\VueJsTemplating\Test;
 
+use Exception;
+use PHPUnit_Framework_TestCase;
 use WMDE\VueJsTemplating\Templating;
 
-class TemplatingTest extends \PHPUnit_Framework_TestCase {
+class TemplatingTest extends PHPUnit_Framework_TestCase {
 
 	/**
 	 * @test
@@ -19,7 +21,7 @@ class TemplatingTest extends \PHPUnit_Framework_TestCase {
 	 * @test
 	 */
 	public function templateHasTwoRootNodes_ThrowsAnException() {
-		$this->setExpectedException( \Exception::class );
+		$this->setExpectedException( Exception::class );
 		$this->createAndRender( '<p></p><p></p>', [] );
 	}
 
@@ -73,7 +75,7 @@ class TemplatingTest extends \PHPUnit_Framework_TestCase {
 	 * @test
 	 */
 	public function templateWithMustacheVariable_VariableIsUndefined_ThrowsException() {
-		$this->setExpectedException( \Exception::class );
+		$this->setExpectedException( Exception::class );
 		$this->createAndRender( '<p>{{value}}</p>', [] );
 	}
 
@@ -81,7 +83,7 @@ class TemplatingTest extends \PHPUnit_Framework_TestCase {
 	 * @test
 	 */
 	public function templateWithFilter_FilterIsUndefined_ThrowsException() {
-		$this->setExpectedException( \Exception::class );
+		$this->setExpectedException( Exception::class );
 		$this->createAndRender( '<p>{{value|nonexistentFilter}}</p>', [ 'value' => 'some value' ] );
 	}
 
@@ -263,12 +265,12 @@ class TemplatingTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @param $template
-	 * @param $data
+	 * @param string $template HTML
+	 * @param array $data
 	 * @param callable[] $filters
 	 * @return string
 	 */
-	private function createAndRender( $template, $data, $filters = [] ) {
+	private function createAndRender( $template, array $data, array $filters = [] ) {
 		$templating = new Templating();
 		return $templating->render( $template, $data, $filters );
 	}

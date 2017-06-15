@@ -2,13 +2,20 @@
 
 namespace WMDE\VueJsTemplating;
 
+use DOMAttr;
+use DOMCharacterData;
+use DOMDocument;
+use DOMElement;
 use DOMNode;
 use DOMNodeList;
+use DOMText;
+use Exception;
+use RuntimeException;
 
 class Component {
 
 	/**
-	 * @var string
+	 * @var string HTML
 	 */
 	private $template;
 
@@ -18,7 +25,7 @@ class Component {
 	private $filters = [];
 
 	/**
-	 * @param string $template
+	 * @param string $template HTML
 	 * @param callable[] $filters
 	 */
 	public function __construct( $template, array $filters ) {
@@ -40,15 +47,15 @@ class Component {
 	}
 
 	/**
-	 * @param $template
-	 * @return \DOMDocument
+	 * @param string $template HTML
+	 * @return DOMDocument
 	 */
 	private function parseHtml( $template ) {
 		$internalErrors = libxml_use_internal_errors( true );
-		$document = new \DOMDocument();
+		$document = new DOMDocument();
 
 		//TODO Unicode characters in template will not work correctly. Fix.
-		if ( !@$document->loadHTML( $template ) ) {
+		if ( !$document->loadHTML( $template ) ) {
 			//TODO Test failure
 		}
 
@@ -64,15 +71,15 @@ class Component {
 	}
 
 	/**
-	 * @param $document
-	 * @return \DOMElement
-	 * @throws \Exception
+	 * @param DOMDocument $document
+	 * @return DOMElement
+	 * @throws Exception
 	 */
-	private function getRootNode( $document ) {
+	private function getRootNode( DOMDocument $document ) {
 		$rootNodes = iterator_to_array( $document->documentElement->childNodes->item( 0 )->childNodes );
 
 		if ( count( $rootNodes ) > 1 ) {
-			throw new \Exception( 'Template should have only one root node' );
+			throw new Exception( 'Template should have only one root node' );
 		}
 
 		return $rootNodes[0];
@@ -101,13 +108,13 @@ class Component {
 	}
 
 	/**
-	 * @param $node
+	 * @param DOMNode $node
 	 */
-	private function stripEventHandlers( \DOMNode $node ) {
+	private function stripEventHandlers( DOMNode $node ) {
 		if ( $this->isTextNode( $node ) ) {
 			return;
 		}
-		/** @var \DOMAttr $attribute */
+		/** @var DOMAttr $attribute */
 		foreach ( $node->attributes as $attribute ) {
 			if ( strpos( $attribute->name, 'v-on:' ) === 0 ) {
 				$node->removeAttribute( $attribute->name );
@@ -116,11 +123,11 @@ class Component {
 	}
 
 	/**
-	 * @param $node
-	 * @param $data
+	 * @param DOMNode $node
+	 * @param array $data
 	 */
-	private function replaceMustacheVariables( \DOMNode $node, array $data ) {
-		if ( $node instanceof \DOMText ) {
+	private function replaceMustacheVariables( DOMNode $node, array $data ) {
+		if ( $node instanceof DOMText ) {
 			$text = $node->wholeText;
 
 			$regex = '/\{\{
@@ -136,7 +143,7 @@ class Component {
 				if ( $filterIsSet ) {
 					$filterName = $matches['filterName'][$index];
 					if ( !array_key_exists( $filterName, $this->filters ) ) {
-						throw new \RuntimeException( "Filter '{$filterName}' is undefined" );
+						throw new RuntimeException( "Filter '{$filterName}' is undefined" );
 					}
 					$filter = $this->filters[$filterName];
 					$value = $filter( $value );
@@ -151,8 +158,8 @@ class Component {
 		}
 	}
 
-	private function handleAttributeBinding( \DOMElement $node, array $data ) {
-		/** @var \DOMAttr $attribute */
+	private function handleAttributeBinding( DOMElement $node, array $data ) {
+		/** @var DOMAttr $attribute */
 		foreach ( $node->attributes as $attribute ) {
 			if ( !preg_match( '/^:[\-\_\w\d]+$/', $attribute->name ) ) {
 				continue;
@@ -185,7 +192,7 @@ class Component {
 				continue;
 			}
 
-			/** @var \DOMElement $node */
+			/** @var DOMElement $node */
 			if ( $node->hasAttribute( 'v-if' ) ) {
 				$conditionString = $node->getAttribute( 'v-if' );
 				$node->removeAttribute( 'v-if' );
@@ -210,12 +217,12 @@ class Component {
 		}
 	}
 
-	private function handleFor( \DOMNode $node, array $data, array $filters ) {
+	private function handleFor( DOMNode $node, array $data, array $filters ) {
 		if ( $this->isTextNode( $node ) ) {
 			return;
 		}
 
-		/** @var \DOMElement $node */
+		/** @var DOMElement $node */
 		if ( $node->hasAttribute( 'v-for' ) ) {
 			list( $itemName, $listName ) = explode( ' in ', $node->getAttribute( 'v-for' ) );
 			$node->removeAttribute( 'v-for' );
@@ -246,7 +253,7 @@ class Component {
 			$value = $data;
 			foreach ( $parts as $key ) {
 				if ( !array_key_exists( $key, $value ) ) {
-					throw new \RuntimeException( "Undefined variable '{$expression}'" );
+					throw new RuntimeException( "Undefined variable '{$expression}'" );
 				}
 				$value = $value[$key];
 			}
@@ -255,19 +262,19 @@ class Component {
 		return $value;
 	}
 
-	private function removeNode( \DOMElement $node ) {
+	private function removeNode( DOMElement $node ) {
 		$node->parentNode->removeChild( $node );
 	}
 
 	/**
-	 * @param $node
+	 * @param DOMNode $node
 	 * @return bool
 	 */
-	private function isTextNode( $node ) {
-		return $node instanceof \DOMCharacterData;
+	private function isTextNode( DOMNode $node ) {
+		return $node instanceof DOMCharacterData;
 	}
 
-	private function isRemovedFromTheDom( \DOMNode $node ) {
+	private function isRemovedFromTheDom( DOMNode $node ) {
 		return $node->parentNode === null;
 	}
 
