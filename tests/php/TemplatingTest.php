@@ -20,7 +20,7 @@ class TemplatingTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function templateHasTwoRootNodes_ThrowsAnException() {
 		$this->setExpectedException( \Exception::class );
-		$result = $this->createAndRender( '<p></p><p></p>', [] );
+		$this->createAndRender( '<p></p><p></p>', [] );
 	}
 
 	/**
@@ -77,13 +77,12 @@ class TemplatingTest extends \PHPUnit_Framework_TestCase {
 		$this->createAndRender( '<p>{{value}}</p>', [] );
 	}
 
-
 	/**
 	 * @test
 	 */
 	public function templateWithFilter_FilterIsUndefined_ThrowsException() {
 		$this->setExpectedException( \Exception::class );
-		$this->createAndRender( '<p>{{value|nonexistentFilter}}</p>', ['value' => 'some value'] );
+		$this->createAndRender( '<p>{{value|nonexistentFilter}}</p>', [ 'value' => 'some value' ] );
 	}
 
 	/**
@@ -152,7 +151,10 @@ class TemplatingTest extends \PHPUnit_Framework_TestCase {
 	 * @test
 	 */
 	public function templateWithIfElseBlockAndTruthfulCondition_ElseIsRemoved() {
-		$result = $this->createAndRender( '<p><a v-if="variable">if</a><a v-else>else</a></p>', [ 'variable' => true ] );
+		$result = $this->createAndRender(
+			'<p><a v-if="variable">if</a><a v-else>else</a></p>',
+			[ 'variable' => true ]
+		);
 
 		assertThat( $result, is( equalTo( '<p><a>if</a></p>' ) ) );
 	}
@@ -161,7 +163,10 @@ class TemplatingTest extends \PHPUnit_Framework_TestCase {
 	 * @test
 	 */
 	public function templateWithIfElseBlockAndNontruthfulCondition_ElseIsDisplayed() {
-		$result = $this->createAndRender( '<p><a v-if="variable">if</a><a v-else>else</a></p>', [ 'variable' => false ] );
+		$result = $this->createAndRender(
+			'<p><a v-if="variable">if</a><a v-else>else</a></p>',
+			[ 'variable' => false ]
+		);
 
 		assertThat( $result, is( equalTo( '<p><a>else</a></p>' ) ) );
 	}
@@ -179,7 +184,10 @@ class TemplatingTest extends \PHPUnit_Framework_TestCase {
 	 * @test
 	 */
 	public function templateWithForLoopAndSingleElementInArrayToIterate_RenderedOnce() {
-		$result = $this->createAndRender( '<p><a v-for="item in list"></a></p>', [ 'list' => [ 1 ] ] );
+		$result = $this->createAndRender(
+			'<p><a v-for="item in list"></a></p>',
+			[ 'list' => [ 1 ] ]
+		);
 
 		assertThat( $result, is( equalTo( '<p><a></a></p>' ) ) );
 	}
@@ -188,7 +196,10 @@ class TemplatingTest extends \PHPUnit_Framework_TestCase {
 	 * @test
 	 */
 	public function templateWithForLoopAndMultipleElementsInArrayToIterate_RenderedMultipleTimes() {
-		$result = $this->createAndRender( '<p><a v-for="item in list"></a></p>', [ 'list' => [ 1, 2 ] ] );
+		$result = $this->createAndRender(
+			'<p><a v-for="item in list"></a></p>',
+			[ 'list' => [ 1, 2 ] ]
+		);
 
 		assertThat( $result, is( equalTo( '<p><a></a><a></a></p>' ) ) );
 	}
@@ -197,7 +208,10 @@ class TemplatingTest extends \PHPUnit_Framework_TestCase {
 	 * @test
 	 */
 	public function templateWithForLoopMustache_RendersCorrectValues() {
-		$result = $this->createAndRender( '<p><a v-for="item in list">{{item}}</a></p>', [ 'list' => [ 1, 2 ] ] );
+		$result = $this->createAndRender(
+			'<p><a v-for="item in list">{{item}}</a></p>',
+			[ 'list' => [ 1, 2 ] ]
+		);
 
 		assertThat( $result, is( equalTo( '<p><a>1</a><a>2</a></p>' ) ) );
 	}
@@ -215,7 +229,10 @@ class TemplatingTest extends \PHPUnit_Framework_TestCase {
 	 * @test
 	 */
 	public function templateWithAttributeBinding_ConditionIsTrue_AttributeIsRendered() {
-		$result = $this->createAndRender( '<p :disabled="condition"></p>', [ 'condition' => true ] );
+		$result = $this->createAndRender(
+			'<p :disabled="condition"></p>',
+			[ 'condition' => true ]
+		);
 
 		assertThat( $result, is( equalTo( '<p disabled></p>' ) ) );
 	}
@@ -225,7 +242,10 @@ class TemplatingTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function templateWithAttributeBinding_ConditionIsString_AttributeIsRenderedWithThatString() {
 		//TODO Rename variable name
-		$result = $this->createAndRender( '<p :attr1="condition"></p>', [ 'condition' => 'some string' ] );
+		$result = $this->createAndRender(
+			'<p :attr1="condition"></p>',
+			[ 'condition' => 'some string' ]
+		);
 
 		assertThat( $result, is( equalTo( '<p attr1="some string"></p>' ) ) );
 	}
@@ -234,7 +254,10 @@ class TemplatingTest extends \PHPUnit_Framework_TestCase {
 	 * @test
 	 */
 	public function templateWithPropertyAccessInMustache_CorrectValueIsRendered() {
-		$result = $this->createAndRender( '<p>{{var.property}}</p>', [ 'var' => ['property' => 'value'] ] );
+		$result = $this->createAndRender(
+			'<p>{{var.property}}</p>',
+			[ 'var' => [ 'property' => 'value' ] ]
+		);
 
 		assertThat( $result, is( equalTo( '<p>value</p>' ) ) );
 	}
@@ -242,6 +265,7 @@ class TemplatingTest extends \PHPUnit_Framework_TestCase {
 	/**
 	 * @param $template
 	 * @param $data
+	 * @param callable[] $filters
 	 * @return string
 	 */
 	private function createAndRender( $template, $data, $filters = [] ) {
@@ -259,14 +283,16 @@ class TemplatingTest extends \PHPUnit_Framework_TestCase {
 	 * 		<div v-else>else body</div>
 	 * </div>
 	 *
-	 * Invalid template [Error compiling template: v-else used on element <div> without corresponding v-if]:
+	 * Invalid template [Error compiling template: v-else used on element <div> without
+	 * corresponding v-if]:
 	 * <div>
 	 * 		<div v-if="condition">if body</div>
 	 * 		<span>something</span>
 	 * 		<div v-else>else body</div>
 	 * </div>
 	 *
-	 * Invalid template [Error compiling template: v-else used on element <div> without corresponding v-if]:
+	 * Invalid template [Error compiling template: v-else used on element <div> without
+	 * corresponding v-if]:
 	 * <div>
 	 * 		<div v-if="condition">if body</div>
 	 * 		<div>
@@ -274,7 +300,8 @@ class TemplatingTest extends \PHPUnit_Framework_TestCase {
 	 * 		</div>
 	 * </div>
 	 *
-	 * Invalid template [Error compiling template: text "something" between v-if and v-else(-if) will be ignored.]:
+	 * Invalid template [Error compiling template: text "something" between v-if and v-else(-if)
+	 * will be ignored.]:
 	 * <div>
 	 * 		<div v-if="condition">if body</div>
 	 * 		something

@@ -2,6 +2,9 @@
 
 namespace WMDE\VueJsTemplating;
 
+use DOMNode;
+use DOMNodeList;
+
 class Component {
 
 	/**
@@ -56,6 +59,7 @@ class Component {
 			//TODO html5 tags can fail parsing
 			//TODO Throw an exception
 		}
+
 		return $document;
 	}
 
@@ -66,23 +70,25 @@ class Component {
 	 */
 	private function getRootNode( $document ) {
 		$rootNodes = iterator_to_array( $document->documentElement->childNodes->item( 0 )->childNodes );
+
 		if ( count( $rootNodes ) > 1 ) {
 			throw new \Exception( 'Template should have only one root node' );
 		}
+
 		return $rootNodes[0];
 	}
 
 	/**
-	 * @param $rootNode
+	 * @param DOMNode $node
 	 * @param array $data
-	 * @param array $filters
 	 */
-	private function handleNode( \DOMNode $node, array $data ) {
+	private function handleNode( DOMNode $node, array $data ) {
 		$filters = $this->filters;
 		$this->replaceMustacheVariables( $node, $data );
+
 		if ( !$this->isTextNode( $node ) ) {
 			$this->stripEventHandlers( $node );
-			$this->handleAttributeBinding( $node, $data);
+			$this->handleAttributeBinding( $node, $data );
 			$this->handleIf( $node->childNodes, $data );
 			$this->handleFor( $node, $data, $filters );
 
@@ -145,7 +151,6 @@ class Component {
 		}
 	}
 
-
 	private function handleAttributeBinding( \DOMElement $node, array $data ) {
 		/** @var \DOMAttr $attribute */
 		foreach ( $node->attributes as $attribute ) {
@@ -168,16 +173,18 @@ class Component {
 	}
 
 	/**
-	 * @param $node
-	 * @param $data
+	 * @param DOMNodeList $nodes
+	 * @param array $data
 	 */
-	private function handleIf( \DOMNodeList $nodes, array $data ) {
-		// Iteration of iterator breaks if we try to remove items while iterating, so defer node removing until finished iterating
+	private function handleIf( DOMNodeList $nodes, array $data ) {
+		// Iteration of iterator breaks if we try to remove items while iterating, so defer node
+		// removing until finished iterating.
 		$nodesToRemove = [];
 		foreach ( $nodes as $node ) {
 			if ( $this->isTextNode( $node ) ) {
 				continue;
 			}
+
 			/** @var \DOMElement $node */
 			if ( $node->hasAttribute( 'v-if' ) ) {
 				$conditionString = $node->getAttribute( 'v-if' );
@@ -189,9 +196,9 @@ class Component {
 				}
 
 				$previousIfCondition = $condition;
-
 			} elseif ( $node->hasAttribute( 'v-else' ) ) {
 				$node->removeAttribute( 'v-else' );
+
 				if ( $previousIfCondition ) {
 					$nodesToRemove[] = $node;
 				}
@@ -201,7 +208,6 @@ class Component {
 		foreach ( $nodesToRemove as $node ) {
 			$this->removeNode( $node );
 		}
-
 	}
 
 	private function handleFor( \DOMNode $node, array $data, array $filters ) {
@@ -232,13 +238,13 @@ class Component {
 	private function evaluateExpression( $expression, array $data ) {
 		if ( strpos( $expression, '!' ) === 0 ) { // ! operator application
 			$expression = substr( $expression, 1 );
-			$value = !$this->evaluateExpression( $expression, $data);
-		} else if (strpos( $expression, "'") === 0) { // string evaluation
+			$value = !$this->evaluateExpression( $expression, $data );
+		} elseif ( strpos( $expression, "'" ) === 0 ) { // string evaluation
 			$value = substr( $expression, 1, strlen( $expression ) - 2 );
 		} else { // variable evaluation
 			$parts = explode( '.', $expression );
 			$value = $data;
-			foreach ($parts as $key) {
+			foreach ( $parts as $key ) {
 				if ( !array_key_exists( $key, $value ) ) {
 					throw new \RuntimeException( "Undefined variable '{$expression}'" );
 				}

@@ -10,7 +10,6 @@ const defaultFilters = {
 	message: String
 };
 
-
 readFixtureDir().then( function ( files ) {
 	files.forEach( function ( fileName ) {
 		var filePath = fixtureDir + '/' + fileName;
@@ -24,7 +23,6 @@ readFixtureDir().then( function ( files ) {
 			} )
 	} );
 } );
-
 
 function extractDataFromFixture( html ) {
 	const $ = cheerio.load( html );
@@ -75,6 +73,7 @@ function readFile( filePath ) {
 		} );
 	} );
 }
+
 function saveFile( filePath, contents ) {
 	return new Promise( function ( resolve, reject ) {
 		fs.writeFile( filePath, contents, 'utf8', function ( err ) {
@@ -86,8 +85,6 @@ function saveFile( filePath, contents ) {
 		} );
 	} );
 }
-
-
 
 function readFixtureDir() {
 	return new Promise( function ( resolve, reject ) {
@@ -102,14 +99,13 @@ function readFixtureDir() {
 }
 
 function saveResultToFile(filePath, renderResult) {
-	readFile(filePath).then(function (html) {
+	readFile( filePath ).then( function ( html ) {
 		const $ = cheerio.load( html );
-		$('#result').remove();
+		$( '#result' ).remove();
 
 		const $resultElement = $( '<div id="result"></div>' ).html( "\n\t" + generatedComment + "\n\t" + renderResult + "\n" );
 		$.root().children().last().after( $resultElement ).after("\n");
 
 		return saveFile( filePath, $.html().trim() + "\n" );
-	})
-
+	} );
 }

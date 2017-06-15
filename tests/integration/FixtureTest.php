@@ -10,7 +10,7 @@ class FixtureTest extends \PHPUnit_Framework_TestCase {
 	 * @test
 	 * @dataProvider provideFixtures
 	 */
-	public function phpRenderingEqualsVueJsRendering($template, $data, $expectedResult) {
+	public function phpRenderingEqualsVueJsRendering( $template, $data, $expectedResult ) {
 		$templating = new Templating();
 		$filters = [
 			'message' => 'strval'
@@ -36,8 +36,8 @@ class FixtureTest extends \PHPUnit_Framework_TestCase {
 			@$DOMDocument->loadHTMLFile( $fileInfo->getPathname() );
 
 			$template = $this->getContents( $DOMDocument, 'template' );
-			$data = json_decode($this->getContents( $DOMDocument, 'data' ), true);
-			if (json_last_error() !== JSON_ERROR_NONE) {
+			$data = json_decode( $this->getContents( $DOMDocument, 'data' ), true );
+			if ( json_last_error() !== JSON_ERROR_NONE ) {
 				throw new \RuntimeException(
 					'JSON parse error: ' . json_last_error_msg() . ' in "#data" block in file ' . $fileInfo->getFilename()
 				);
@@ -75,19 +75,20 @@ class FixtureTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @param $expectedResult
-	 * @param $result
+	 * @param string $expectedResult
+	 * @param string $result
 	 */
 	private function assertEqualHtml( $expectedResult, $result ) {
 		$expectedResult = $this->normalizeHtml( $expectedResult );
 		$result = $this->normalizeHtml( $result );
 
-
 		$this->assertEquals( $expectedResult, $result );
 	}
 
 	/**
-	 * @param $html
+	 * @param string $html
+	 *
+	 * @return string HTML
 	 */
 	private function normalizeHtml( $html ) {
 		$html = preg_replace( '/<!--.*?-->/', '', $html );
@@ -96,4 +97,5 @@ class FixtureTest extends \PHPUnit_Framework_TestCase {
 		$html = trim( $html );
 		return $html;
 	}
+
 }
