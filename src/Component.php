@@ -99,14 +99,13 @@ class Component {
 	 * @param array $data
 	 */
 	private function handleNode( DOMNode $node, array $data ) {
-		$filters = $this->filters;
 		$this->replaceMustacheVariables( $node, $data );
 
 		if ( !$this->isTextNode( $node ) ) {
 			$this->stripEventHandlers( $node );
 			$this->handleAttributeBinding( $node, $data );
 			$this->handleIf( $node->childNodes, $data );
-			$this->handleFor( $node, $data, $filters );
+			$this->handleFor( $node, $data );
 
 			if ( !$this->isRemovedFromTheDom( $node ) ) {
 				foreach ( $node->childNodes as $childNode ) {
@@ -226,7 +225,7 @@ class Component {
 		}
 	}
 
-	private function handleFor( DOMNode $node, array $data, array $filters ) {
+	private function handleFor( DOMNode $node, array $data ) {
 		if ( $this->isTextNode( $node ) ) {
 			return;
 		}
@@ -239,7 +238,7 @@ class Component {
 			foreach ( $data[$listName] as $item ) {
 				$newNode = $node->cloneNode( true );
 				$node->parentNode->insertBefore( $newNode, $node );
-				$this->handleNode( $newNode, array_merge( $data, [ $itemName => $item ] ), $filters );
+				$this->handleNode( $newNode, array_merge( $data, [ $itemName => $item ] ));
 			}
 
 			$this->removeNode( $node );
