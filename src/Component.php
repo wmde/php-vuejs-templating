@@ -12,6 +12,8 @@ use DOMText;
 use Exception;
 use RuntimeException;
 
+use WMDE\VueJsTemplating\JsParsing\JsExpressionParser;
+
 class Component {
 
 	/**
@@ -25,12 +27,18 @@ class Component {
 	private $filters = [];
 
 	/**
+	 * @var JsExpressionParser
+	 */
+	private $expressionParser;
+
+	/**
 	 * @param string $template HTML
 	 * @param callable[] $filters
 	 */
 	public function __construct( $template, array $filters ) {
 		$this->template = $template;
 		$this->filters = $filters;
+		$this->expressionParser = new JsExpressionParser();
 	}
 
 	/**
@@ -243,23 +251,7 @@ class Component {
 	 * @return bool
 	 */
 	private function evaluateExpression( $expression, array $data ) {
-		if ( strpos( $expression, '!' ) === 0 ) { // ! operator application
-			$expression = substr( $expression, 1 );
-			$value = !$this->evaluateExpression( $expression, $data );
-		} elseif ( strpos( $expression, "'" ) === 0 ) { // string evaluation
-			$value = substr( $expression, 1, strlen( $expression ) - 2 );
-		} else { // variable evaluation
-			$parts = explode( '.', $expression );
-			$value = $data;
-			foreach ( $parts as $key ) {
-				if ( !array_key_exists( $key, $value ) ) {
-					throw new RuntimeException( "Undefined variable '{$expression}'" );
-				}
-				$value = $value[$key];
-			}
-		}
-
-		return $value;
+		return $this->expressionParser->parse( $expression )->evaluate( $data );
 	}
 
 	private function removeNode( DOMElement $node ) {
