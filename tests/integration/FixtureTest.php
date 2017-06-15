@@ -38,7 +38,10 @@ class FixtureTest extends PHPUnit_Framework_TestCase {
 			}
 
 			$document = new DOMDocument();
-			$document->loadHTMLFile( $fileInfo->getPathname() );
+			// Ignore all warnings issued by DOMDocument when parsing
+			// as soon as VueJs template is not actually a "valid" HTML
+			/** @noinspection UsageOfSilenceOperatorInspection */
+			@$document->loadHTMLFile( $fileInfo->getPathname() );
 
 			$template = $this->getContents( $document, 'template' );
 			$data = json_decode( $this->getContents( $document, 'data' ), true );
