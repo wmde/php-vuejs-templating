@@ -42,4 +42,16 @@ class BasicJsExpressionParserTest extends \PHPUnit_Framework_TestCase {
 		$this->assertEquals( false, $negation->evaluate( [ 'variable' => true ] ) );
 	}
 
+	/**
+	 * @test
+	 */
+	public function ignoresTrailingAndLeadingSpaces() {
+		$jsExpressionEvaluator = new BasicJsExpressionParser();
+
+		$parsedExpression = $jsExpressionEvaluator->parse( " 'some string' " );
+		$result = $parsedExpression->evaluate( [] );
+
+		$this->assertEquals( 'some string', $result );
+	}
+
 }
