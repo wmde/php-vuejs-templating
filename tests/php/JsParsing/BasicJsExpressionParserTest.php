@@ -2,15 +2,15 @@
 
 namespace WMDE\VueJsTemplating\Test\JsParsing;
 
-use WMDE\VueJsTemplating\JsParsing\JsExpressionParser;
+use WMDE\VueJsTemplating\JsParsing\BasicJsExpressionParser;
 
-class JsExpressionParserTest extends \PHPUnit_Framework_TestCase {
+class BasicJsExpressionParserTest extends \PHPUnit_Framework_TestCase {
 
 	/**
 	 * @test
 	 */
 	public function canParseString() {
-		$jsExpressionEvaluator = new JsExpressionParser();
+		$jsExpressionEvaluator = new BasicJsExpressionParser();
 
 		$parsedExpression = $jsExpressionEvaluator->parse( "'some string'" );
 		$result = $parsedExpression->evaluate( [] );
@@ -22,7 +22,7 @@ class JsExpressionParserTest extends \PHPUnit_Framework_TestCase {
 	 * @test
 	 */
 	public function canParsePropertyAccess() {
-		$jsExpressionEvaluator = new JsExpressionParser();
+		$jsExpressionEvaluator = new BasicJsExpressionParser();
 
 		$parsedExpression = $jsExpressionEvaluator->parse( "variable.property" );
 		$result = $parsedExpression->evaluate( [ 'variable' => [ 'property' => 'some value' ] ] );
@@ -34,7 +34,7 @@ class JsExpressionParserTest extends \PHPUnit_Framework_TestCase {
 	 * @test
 	 */
 	public function canParseNegationOperator() {
-		$jsExpressionEvaluator = new JsExpressionParser();
+		$jsExpressionEvaluator = new BasicJsExpressionParser();
 
 		$negation = $jsExpressionEvaluator->parse( "!variable" );
 

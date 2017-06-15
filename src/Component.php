@@ -12,7 +12,8 @@ use DOMText;
 use Exception;
 use RuntimeException;
 
-use WMDE\VueJsTemplating\JsParsing\JsExpressionParser;
+use WMDE\VueJsTemplating\JsParsing\BasicJsExpressionParser;
+use WMDE\VueJsTemplating\JsParsing\CachingExpressionParser;
 
 class Component {
 
@@ -27,7 +28,7 @@ class Component {
 	private $filters = [];
 
 	/**
-	 * @var JsExpressionParser
+	 * @var BasicJsExpressionParser
 	 */
 	private $expressionParser;
 
@@ -38,7 +39,7 @@ class Component {
 	public function __construct( $template, array $filters ) {
 		$this->template = $template;
 		$this->filters = $filters;
-		$this->expressionParser = new JsExpressionParser();
+		$this->expressionParser = new CachingExpressionParser( new BasicJsExpressionParser() );
 	}
 
 	/**
