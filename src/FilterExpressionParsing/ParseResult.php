@@ -2,6 +2,7 @@
 
 namespace WMDE\VueJsTemplating\FilterExpressionParsing;
 
+use WMDE\VueJsTemplating\JsParsing\FilterApplication;
 use WMDE\VueJsTemplating\JsParsing\JsExpressionParser;
 use WMDE\VueJsTemplating\JsParsing\ParsedExpression;
 
@@ -46,7 +47,37 @@ class ParseResult {
 	 * @return ParsedExpression
 	 */
 	public function toExpression( JsExpressionParser $expressionParser, array $filters ) {
-		return $expressionParser->parse( $this->expressions[0] );
+		if ( count( $this->filterCalls ) === 0 ) {
+			return $expressionParser->parse( $this->expressions[0] );
+		}
+
+		$nextFilterArguments = $this->parseExpressions( $expressionParser, $this->expressions );
+
+		$result = null;
+		foreach ( $this->filterCalls as $filterCall ) {
+			$filter = $filters[$filterCall->filterName()];
+			$filerArguments = array_merge(
+				$nextFilterArguments,
+				$this->parseExpressions( $expressionParser, $filterCall->arguments() )
+			);
+
+			$result = new FilterApplication( $filter, $filerArguments );
+			$nextFilterArguments = [ $result ];
+		}
+
+		return $result;
+	}
+
+	/**
+	 * @param string[] $expressions
+	 */
+	private function parseExpressions( JsExpressionParser $expressionParser, array $expressions ) {
+		return array_map(
+			function ( $exp ) use ( $expressionParser ) {
+				return $expressionParser->parse( $exp );
+			},
+			$expressions
+		);
 	}
 
 }
