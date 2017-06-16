@@ -12,10 +12,12 @@ use DOMText;
 use Exception;
 use RuntimeException;
 
+use WMDE\VueJsTemplating\FilterExpressionParsing\FilterParser;
 use WMDE\VueJsTemplating\JsParsing\BasicJsExpressionParser;
 use WMDE\VueJsTemplating\JsParsing\CachingExpressionParser;
 
 class Component {
+	private $filterParser;
 
 	/**
 	 * @var string HTML
@@ -40,6 +42,7 @@ class Component {
 		$this->template = $template;
 		$this->filters = $filters;
 		$this->expressionParser = new CachingExpressionParser( new BasicJsExpressionParser() );
+		$this->filterParser = new FilterParser();
 	}
 
 	/**
@@ -138,27 +141,17 @@ class Component {
 		if ( $node instanceof DOMText ) {
 			$text = $node->wholeText;
 
-			$regex = '/\{\{
-							(?P<expression> [^|]*?)# var name or string literal
-							(?: \| (?P<filterName>\w+))?
-						\}\}/x';
+			$regex = '/\{\{(?P<expression>.*?)\}\}/x';
 			preg_match_all( $regex, $text, $matches );
 
 			foreach ( $matches['expression'] as $index => $expression ) {
-				$value = $this->evaluateExpression( $expression, $data );
-
-				$filterIsSet = !empty( $matches['filterName'][$index] );
-				if ( $filterIsSet ) {
-					$filterName = $matches['filterName'][$index];
-					if ( !array_key_exists( $filterName, $this->filters ) ) {
-						throw new RuntimeException( "Filter '{$filterName}' is undefined" );
-					}
-					$filter = $this->filters[$filterName];
-					$value = $filter( $value );
-				}
+				$value = $this->filterParser->parse( $expression )
+					->toExpression( $this->expressionParser, $this->filters )
+					->evaluate( $data );
 
 				$text = str_replace( $matches[0][$index], $value, $text );
 			}
+
 			if ( $text !== $node->wholeText ) {
 				$newNode = $node->ownerDocument->createTextNode( $text );
 				$node->parentNode->replaceChild( $newNode, $node );

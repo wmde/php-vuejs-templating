@@ -2,6 +2,7 @@
 
 namespace WMDE\VueJsTemplating\FilterExpressionParsing;
 
+use RuntimeException;
 use WMDE\VueJsTemplating\JsParsing\FilterApplication;
 use WMDE\VueJsTemplating\JsParsing\JsExpressionParser;
 use WMDE\VueJsTemplating\JsParsing\ParsedExpression;
@@ -43,7 +44,7 @@ class ParseResult {
 
 	/**
 	 * @param JsExpressionParser $expressionParser
-	 * @param array $filters
+	 * @param callable[] $filters Indexed by name
 	 * @return ParsedExpression
 	 */
 	public function toExpression( JsExpressionParser $expressionParser, array $filters ) {
@@ -55,6 +56,9 @@ class ParseResult {
 
 		$result = null;
 		foreach ( $this->filterCalls as $filterCall ) {
+			if ( !array_key_exists( $filterCall->filterName(), $filters ) ) {
+				throw new RuntimeException( "Filter '{$filterCall->filterName()}' is undefined" );
+			}
 			$filter = $filters[$filterCall->filterName()];
 			$filerArguments = array_merge(
 				$nextFilterArguments,
