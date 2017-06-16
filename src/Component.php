@@ -162,7 +162,7 @@ class Component {
 	private function handleAttributeBinding( DOMElement $node, array $data ) {
 		/** @var DOMAttr $attribute */
 		foreach ( $node->attributes as $attribute ) {
-			if ( !preg_match( '/^:[\-\_\w\d]+$/', $attribute->name ) ) {
+			if ( !preg_match( '/^:[\-\_\w]+$/', $attribute->name ) ) {
 				continue;
 			}
 
