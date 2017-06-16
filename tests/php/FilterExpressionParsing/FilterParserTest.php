@@ -10,17 +10,6 @@ class FilterParserTest extends \PHPUnit_Framework_TestCase {
 
 	/**
 	 * @test
-	 */
-	public function singleVariable() {
-		$filterParser = new FilterParser();
-
-		$result = $filterParser->parse( 'var1|filter' );
-
-		$this->assertEquals( new ParseResult( [ 'var1' ], [new FilterCall('filter', [])] ), $result );
-	}
-
-	/**
-	 * @test
 	 * @dataProvider provideParseCases
 	 */
 	public function parseTest($expression, $expectedResult) {
@@ -88,6 +77,15 @@ class FilterParserTest extends \PHPUnit_Framework_TestCase {
 			'variable with filter having string argument' => [
 				'var1|filter("string")',
 				new ParseResult( [ 'var1' ], [new FilterCall('filter', ['"string"'])] )
+			],
+			'complex example' => [
+				'var1, var2 | filter1("string11", "string12")| filter2("string21", "string22")',
+				new ParseResult(
+					[ 'var1', 'var2' ],
+					[
+						new FilterCall('filter1', ['"string11"', '"string12"']),
+						new FilterCall('filter2', ['"string21"', '"string22"'])
+					] )
 			]
 		];
 	}

@@ -5,9 +5,22 @@ namespace WMDE\VueJsTemplating\FilterExpressionParsing;
 
 class FilterParser {
 
-	public function parse( $exp ) {
-		$validDivisionCharRE = '/[\w).+\-_$\]]/';
+	const VALID_DIVISION_CHAR_REGEX = '/[\w).+\-_$\]]/';
 
+	private $filters = [];
+
+	private $expressions = [];
+	private $expressionStart = 0;
+
+	private $nowParsingFilterList = false;
+	private $filterArgStart = null;
+	private $filterArgEnd = null;
+
+	/**
+	 * @param string $exp
+	 * @return ParseResult
+	 */
+	public function parse( $exp ) {
 		$inSingle = false;
 		$inDouble = false;
 		$inTemplateString = false;
@@ -15,100 +28,68 @@ class FilterParser {
 		$curly = 0;
 		$square = 0;
 		$paren = 0;
-		$lastFilterIndex = 0;
+		$currentFilterStart = 0;
 		$c = null;
 		$prev = null;
-		$i= null;
-		$expression= null;
-		$filters = [];
+		$pos= null;
 
-		$expressions = [];
-		$prevExpressionStart = 0;
+		$this->resetState();
 
-		$parsingFilterList = false;
-		$filterArgStart = null;
-		$filterArgEnd = null;
-
-		$pushFilter = function () use (&$filters, &$exp, &$lastFilterIndex, &$i, &$filterArgStart, &$filterArgEnd) {
-			$filterBody = trim( substr( $exp, $lastFilterIndex, $i - $lastFilterIndex ) );
-			$openingParenthesisPos = strpos( $filterBody, '(' );
-			if ($openingParenthesisPos === false) {
-				$filterName = $filterBody;
-				$args = [];
-			} else {
-				$filterName = substr( $filterBody, 0, $openingParenthesisPos );
-				$argString = substr( $exp, $filterArgStart, $filterArgEnd - $filterArgStart + 1 );
-				$args = $this->parse($argString)->expressions();
-			}
-
-			$lastFilterIndex = $i + 1;
-
-			$filters[] = new FilterCall( $filterName, $args );
-		};
-
-		$doFinishExpression = function () use ($exp, &$expressions, &$prevExpressionStart, &$i) {
-			$expressions[] = trim( substr( $exp, $prevExpressionStart, $i - $prevExpressionStart ) );
-			$prevExpressionStart = $i + 1;
-		};
-
-		/** @noinspection CallableInLoopTerminationConditionInspection */
-		for ( $i = 0; $i < strlen( $exp ); $i++) {
+		$len = strlen( $exp );
+		for ( $pos = 0; $pos < $len; $pos++) {
 			$prev = $c;
-			$c = $exp[$i];
+			$c = $exp[$pos];
 			if ($inSingle) {
-				if ( $c === "'" && $prev !== chr( 0x5C ) ) {
+				if ( $c === "'" && $prev !== '\\' ) {
 					$inSingle = false;
 				}
 			} else if ($inDouble) {
-				if ($c === chr(0x22) && $prev !== chr(0x5C)) { $inDouble = false; }
+				if ($c === '"' && $prev !== '\\') { $inDouble = false; }
 			} else if ($inTemplateString) {
-				if ($c === chr(0x60) && $prev !== chr(0x5C)) { $inTemplateString = false; }
+				if ($c === '`' && $prev !== '\\') { $inTemplateString = false; }
 			} else if ($inRegex) {
-				if ($c === chr(0x2f) && $prev !== chr(0x5C)) { $inRegex = false; }
+				if ($c === '/' && $prev !== '\\') { $inRegex = false; }
 			} else if (
-				$c === '|' && // pipe
-				$exp[$i + 1] !== '|' &&
-				$exp[$i - 1] !== '|' &&
+				$c === '|' &&
+				$exp[$pos + 1] !== '|' &&
+				$exp[$pos - 1] !== '|' &&
 				!$curly && !$square && !$paren
 			) {
-				if (!$parsingFilterList) {
-					$doFinishExpression();
-				}
-				$parsingFilterList = true;
-				if ( $expression === null ) {
-					// first filter, end of $expression
-					$lastFilterIndex = $i + 1;
-					$expression = trim( substr( $exp, 0, $i ) );
+				if (!$this->nowParsingFilterList) {
+					$this->finishExpression( $exp, $pos );
+					$currentFilterStart = $pos + 1;
 				} else {
-					$pushFilter();
+					$this->pushFilter( $exp, $pos, $currentFilterStart );
+					$currentFilterStart = $pos + 1;
 				}
-			} elseif ( $c === ',' && !$parsingFilterList && !$curly && !$square && !$paren ) {
-				$doFinishExpression();
+				$this->nowParsingFilterList = true;
+			} elseif ( $c === ',' && !$this->nowParsingFilterList && !$curly && !$square && !$paren ) {
+				$this->finishExpression( $exp, $pos );
 			} else {
 				switch ($c) {
-					case chr(0x22): $inDouble = true; break;         // "
-					case chr(0x27): $inSingle = true; break;         // '
-					case chr(0x60): $inTemplateString = true; break; // `
-					case chr( 0x28 ): // (
-						if ( $parsingFilterList && $paren === 0 ) {
-							$filterArgStart = $i + 1;
+					case '"': $inDouble = true; break;
+					case "'": $inSingle = true; break;
+					case '`': $inTemplateString = true; break;
+					case '(':
+						if ( $this->nowParsingFilterList && $paren === 0 ) {
+							$this->filterArgStart = $pos + 1;
 						}
 						$paren++;
 
 						break;
-					case chr( 0x29 ): // )
+					case ')':
 						$paren--;
-						if ( $parsingFilterList && $paren === 0 ) {
-							$filterArgEnd = $i - 1;
+						if ( $this->nowParsingFilterList && $paren === 0 ) {
+							$this->filterArgEnd = $pos - 1;
 						}
 						break;
-					case '[': $square++; break;                // [
-					case ']': $square--; break;                // ]
-					case '{': $curly++; break;                 // {
-					case '}': $curly--; break;                 // }
+					case '[': $square++; break;
+					case ']': $square--; break;
+					case '{': $curly++; break;
+					case '}': $curly--; break;
 				}
-				if ($c === chr(0x2f)) { // /
-					$j = $i - 1;
+				if ($c === '/') {
+					$j = $pos - 1;
 					$p = null;
 					// find first non-whitespace prev char
 					for (; $j >= 0; $j--) {
@@ -116,24 +97,53 @@ class FilterParser {
 						if ($p !== ' ') { break; }
 					}
 
-					if (!$p || !preg_match($validDivisionCharRE, $p)) {
+					if (!$p || !preg_match( self::VALID_DIVISION_CHAR_REGEX, $p)) {
 						$inRegex = true;
 					}
 				}
 			}
 		}
 
-		if (!$parsingFilterList) {
-			$doFinishExpression();
+		if (!$this->nowParsingFilterList) {
+			$this->finishExpression( $exp, $pos );
 		}
 
-		if ($expression === null) {
-			$expression = trim(substr($exp, 0, $i));
-		} else if ($lastFilterIndex !== 0) {
-			$pushFilter();
+		if ($currentFilterStart !== 0) {
+			$this->pushFilter( $exp, $pos, $currentFilterStart );
 		}
 
-		return new ParseResult( $expressions, $filters );
+		return new ParseResult( $this->expressions, $this->filters );
+	}
+
+	private function pushFilter( $exp, $pos, $currentFilterStart ) {
+		$filterBody = trim( substr( $exp, $currentFilterStart, $pos - $currentFilterStart ) );
+		$openingParenthesisPos = strpos( $filterBody, '(' );
+		if ( $openingParenthesisPos === false ) {
+			$filterName = $filterBody;
+			$args = [];
+		} else {
+			$filterName = substr( $filterBody, 0, $openingParenthesisPos );
+			$argString = substr( $exp, $this->filterArgStart, $this->filterArgEnd - $this->filterArgStart + 1 );
+			$args = (new self())->parse( $argString )->expressions();
+		}
+
+		$this->filters[] = new FilterCall( $filterName, $args );
+	}
+
+	private function finishExpression( $exp, $pos ) {
+		$this->expressions[] = trim( substr( $exp, $this->expressionStart, $pos - $this->expressionStart ) );
+		$this->expressionStart = $pos + 1;
+	}
+
+	private function resetState() {
+		$this->filters = [];
+
+		$this->expressions = [];
+		$this->expressionStart = 0;
+
+		$this->nowParsingFilterList = false;
+		$this->filterArgStart = null;
+		$this->filterArgEnd = null;
 	}
 
 }
