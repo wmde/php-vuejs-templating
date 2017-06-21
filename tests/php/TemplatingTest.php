@@ -265,6 +265,36 @@ class TemplatingTest extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
+	 * @test
+	 */
+	public function templateWithFilterAccessInAttributeBinding_CorrectValueIsRendered() {
+		$result = $this->createAndRender(
+			'<p :attr1="var.property|strtoupper"></p>',
+			[ 'var' => [ 'property' => 'value' ] ],
+			['strtoupper' => 'strtoupper']
+		);
+
+		assertThat( $result, is( equalTo( '<p attr1="VALUE"></p>' ) ) );
+	}
+
+	/**
+	 * @test
+	 */
+	public function templateWithFilterAccessInAttributeBindingInsideTheLoop_CorrectValueIsRendered() {
+		$result = $this->createAndRender(
+			'<p><a v-for="item in items" :attr1="item.property|strtoupper"></a></p>',
+			[ 'items' => [
+				['property' => 'value1'],
+				['property' => 'value2'],
+			] ],
+			['strtoupper' => 'strtoupper']
+		);
+
+		assertThat( $result, is( equalTo( '<p><a attr1="VALUE1"></a><a attr1="VALUE2"></a></p>' ) ) );
+	}
+
+
+	/**
 	 * @param string $template HTML
 	 * @param array $data
 	 * @param callable[] $filters

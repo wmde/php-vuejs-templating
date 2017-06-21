@@ -106,12 +106,13 @@ class Component {
 
 		if ( !$this->isTextNode( $node ) ) {
 			$this->stripEventHandlers( $node );
-			$this->handleAttributeBinding( $node, $data );
-			$this->handleIf( $node->childNodes, $data );
 			$this->handleFor( $node, $data );
 
 			if ( !$this->isRemovedFromTheDom( $node ) ) {
-				foreach ( $node->childNodes as $childNode ) {
+				$this->handleAttributeBinding( $node, $data );
+				$this->handleIf( $node->childNodes, $data );
+
+				foreach ( iterator_to_array( $node->childNodes ) as $childNode ) {
 					$this->handleNode( $childNode, $data );
 				}
 			}
@@ -161,21 +162,23 @@ class Component {
 
 	private function handleAttributeBinding( DOMElement $node, array $data ) {
 		/** @var DOMAttr $attribute */
-		foreach ( $node->attributes as $attribute ) {
+		foreach ( iterator_to_array($node->attributes) as $attribute ) {
 			if ( !preg_match( '/^:[\-\_\w]+$/', $attribute->name ) ) {
 				continue;
 			}
 
-			$expression = $this->evaluateExpression( $attribute->value, $data );
+			$value = $this->filterParser->parse( $attribute->value )
+				->toExpression( $this->expressionParser, $this->filters )
+				->evaluate( $data );
+
 			$name = substr( $attribute->name, 1 );
-			if ( is_bool( $expression ) ) {
-				if ( $expression ) {
+			if ( is_bool( $value ) ) {
+				if ( $value ) {
 					$node->setAttribute( $name, $name );
 				}
 			} else {
-				$node->setAttribute( $name, $expression );
+				$node->setAttribute( $name, $value );
 			}
-
 			$node->removeAttribute( $attribute->name );
 		}
 	}
