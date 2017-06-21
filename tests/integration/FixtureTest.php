@@ -18,7 +18,10 @@ class FixtureTest extends PHPUnit_Framework_TestCase {
 	public function phpRenderingEqualsVueJsRendering( $template, array $data, $expectedResult ) {
 		$templating = new Templating();
 		$filters = [
-			'message' => 'strval'
+			'message' => 'strval',
+			'directionality' => function () {
+				return 'auto';
+			}
 		];
 
 		$result = $templating->render( $template, $data, $filters );
@@ -101,7 +104,15 @@ class FixtureTest extends PHPUnit_Framework_TestCase {
 	private function normalizeHtml( $html ) {
 		$html = preg_replace( '/<!--.*?-->/', '', $html );
 		$html = preg_replace( '/\s+/', ' ', $html );
-		$html = str_replace( '> ', ">\n", $html );
+		// Trim node text
+		$html = str_replace( '> ', ">", $html );
+		$html = str_replace( ' <', "<", $html );
+		// Each tag (open and close) on a new line
+		$html = str_replace( '>', ">\n", $html );
+		$html = str_replace( '<', "\n<", $html );
+		// Remove duplicated new lines
+		$html = str_replace( "\n\n", "\n", $html );
+
 		$html = trim( $html );
 		return $html;
 	}
