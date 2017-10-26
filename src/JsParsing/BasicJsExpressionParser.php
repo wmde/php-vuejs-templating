@@ -27,4 +27,5 @@ class BasicJsExpressionParser implements JsExpressionParser {
 	protected function normalizeExpression( $expression ) {
 		return trim( $expression );
 	}
+
 }

@@ -30,7 +30,7 @@ class ParseResultTest extends \PHPUnit_Framework_TestCase {
 	/**
 	 * @test
 	 */
-	public function toExpression_SingleExpressionWithoutFilters_CreatesThisExpression(  ) {
+	public function toExpression_SingleExpressionWithoutFilters_CreatesThisExpression() {
 		$expressionParser = new BasicJsExpressionParser();
 		$parseResult = new ParseResult( [ "'a'" ], [] );
 

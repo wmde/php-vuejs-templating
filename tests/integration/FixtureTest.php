@@ -44,14 +44,14 @@ class FixtureTest extends PHPUnit_Framework_TestCase {
 			// Ignore all warnings issued by DOMDocument when parsing
 			// as soon as VueJs template is not actually a "valid" HTML
 			/** @noinspection UsageOfSilenceOperatorInspection */
+			// @codingStandardsIgnoreLine
 			@$document->loadHTMLFile( $fileInfo->getPathname() );
 
 			$template = $this->getContents( $document, 'template' );
 			$data = json_decode( $this->getContents( $document, 'data' ), true );
 			if ( json_last_error() !== JSON_ERROR_NONE ) {
-				throw new RuntimeException(
-					'JSON parse error: ' . json_last_error_msg() . ' in "#data" block in file ' . $fileInfo->getFilename()
-				);
+				throw new RuntimeException( 'JSON parse error: ' . json_last_error_msg()
+					. ' in "#data" block in file ' . $fileInfo->getFilename() );
 			}
 
 			$result = $this->getContents( $document, 'result' );

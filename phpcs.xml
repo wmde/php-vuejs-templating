@@ -1,10 +1,12 @@
 <?xml version="1.0"?>
-<ruleset name="Wikibase">
-	<rule ref="vendor/wikibase/wikibase-codesniffer/Wikibase" />
+<ruleset>
+	<rule ref="./vendor/wikibase/wikibase-codesniffer/Wikibase">
+		<exclude name="Wikibase.Commenting.ClassLevelDocumentation" />
+	</rule>
 
 	<rule ref="Generic.Files.LineLength">
 		<properties>
-			<property name="lineLimit" value="107" />
+			<property name="lineLimit" value="101" />
 		</properties>
 	</rule>
 

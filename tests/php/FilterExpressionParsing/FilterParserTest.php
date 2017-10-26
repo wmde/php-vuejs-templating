@@ -12,7 +12,7 @@ class FilterParserTest extends \PHPUnit_Framework_TestCase {
 	 * @test
 	 * @dataProvider provideParseCases
 	 */
-	public function parseTest($expression, $expectedResult) {
+	public function parseTest( $expression, $expectedResult ) {
 		$filterParser = new FilterParser();
 
 		$result = $filterParser->parse( $expression );
@@ -68,23 +68,23 @@ class FilterParserTest extends \PHPUnit_Framework_TestCase {
 			],
 			'variable with filter having no arguments' => [
 				'var1|filter',
-				new ParseResult( [ 'var1' ], [new FilterCall('filter', [])] )
+				new ParseResult( [ 'var1' ], [ new FilterCall( 'filter', [] ) ] )
 			],
 			'variable with filter having variable argument' => [
 				'var1|filter(var2)',
-				new ParseResult( [ 'var1' ], [new FilterCall('filter', ['var2'])] )
+				new ParseResult( [ 'var1' ], [ new FilterCall( 'filter', [ 'var2' ] ) ] )
 			],
 			'variable with filter having string argument' => [
 				'var1|filter("string")',
-				new ParseResult( [ 'var1' ], [new FilterCall('filter', ['"string"'])] )
+				new ParseResult( [ 'var1' ], [ new FilterCall( 'filter', [ '"string"' ] ) ] )
 			],
 			'complex example' => [
 				'var1, var2 | filter1("string11", "string12")| filter2("string21", "string22")',
 				new ParseResult(
 					[ 'var1', 'var2' ],
 					[
-						new FilterCall('filter1', ['"string11"', '"string12"']),
-						new FilterCall('filter2', ['"string21"', '"string22"'])
+						new FilterCall( 'filter1', [ '"string11"', '"string12"' ] ),
+						new FilterCall( 'filter2', [ '"string21"', '"string22"' ] )
 					] )
 			]
 		];

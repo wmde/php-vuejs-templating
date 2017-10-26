@@ -10,13 +10,13 @@ use DOMNode;
 use DOMNodeList;
 use DOMText;
 use Exception;
-use RuntimeException;
 
 use WMDE\VueJsTemplating\FilterExpressionParsing\FilterParser;
 use WMDE\VueJsTemplating\JsParsing\BasicJsExpressionParser;
 use WMDE\VueJsTemplating\JsParsing\CachingExpressionParser;
 
 class Component {
+
 	private $filterParser;
 
 	/**
@@ -163,7 +163,7 @@ class Component {
 
 	private function handleAttributeBinding( DOMElement $node, array $data ) {
 		/** @var DOMAttr $attribute */
-		foreach ( iterator_to_array($node->attributes) as $attribute ) {
+		foreach ( iterator_to_array( $node->attributes ) as $attribute ) {
 			if ( !preg_match( '/^:[\-\_\w]+$/', $attribute->name ) ) {
 				continue;
 			}
@@ -222,7 +222,6 @@ class Component {
 		}
 	}
 
-
 	private function handleFor( DOMNode $node, array $data ) {
 		if ( $this->isTextNode( $node ) ) {
 			return;
@@ -236,7 +235,7 @@ class Component {
 			foreach ( $data[$listName] as $item ) {
 				$newNode = $node->cloneNode( true );
 				$node->parentNode->insertBefore( $newNode, $node );
-				$this->handleNode( $newNode, array_merge( $data, [ $itemName => $item ] ));
+				$this->handleNode( $newNode, array_merge( $data, [ $itemName => $item ] ) );
 			}
 
 			$this->removeNode( $node );
@@ -246,7 +245,7 @@ class Component {
 	private function appendHTML( DOMNode $parent, $source ) {
 		$tmpDoc = new DOMDocument();
 		$tmpDoc->loadHTML( $source );
-		foreach ( $tmpDoc->getElementsByTagName('body')->item(0)->childNodes as $node ) {
+		foreach ( $tmpDoc->getElementsByTagName( 'body' )->item( 0 )->childNodes as $node ) {
 			$node = $parent->ownerDocument->importNode( $node, true );
 			$parent->appendChild( $node );
 		}
