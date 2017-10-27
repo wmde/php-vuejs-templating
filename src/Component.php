@@ -107,6 +107,7 @@ class Component {
 		if ( !$this->isTextNode( $node ) ) {
 			$this->stripEventHandlers( $node );
 			$this->handleFor( $node, $data );
+			$this->handleRawHtml( $node, $data );
 
 			if ( !$this->isRemovedFromTheDom( $node ) ) {
 				$this->handleAttributeBinding( $node, $data );
@@ -221,6 +222,7 @@ class Component {
 		}
 	}
 
+
 	private function handleFor( DOMNode $node, array $data ) {
 		if ( $this->isTextNode( $node ) ) {
 			return;
@@ -238,6 +240,33 @@ class Component {
 			}
 
 			$this->removeNode( $node );
+		}
+	}
+
+	private function appendHTML( DOMNode $parent, $source ) {
+		$tmpDoc = new DOMDocument();
+		$tmpDoc->loadHTML( $source );
+		foreach ( $tmpDoc->getElementsByTagName('body')->item(0)->childNodes as $node ) {
+			$node = $parent->ownerDocument->importNode( $node, true );
+			$parent->appendChild( $node );
+		}
+	}
+
+	private function handleRawHtml( DOMNode $node, array $data ) {
+		if ( $this->isTextNode( $node ) ) {
+			return;
+		}
+
+		/** @var DOMElement $node */
+		if ( $node->hasAttribute( 'v-html' ) ) {
+			$variableName = $node->getAttribute( 'v-html' );
+			$node->removeAttribute( 'v-html' );
+
+			$newNode = $node->cloneNode( true );
+
+			$this->appendHTML( $newNode, $data[$variableName] );
+
+			$node->parentNode->replaceChild( $newNode, $node );
 		}
 	}
 
