@@ -266,9 +266,7 @@ class Component {
 
 			$this->appendHTML( $newNode, $data[$variableName] );
 
-			$node->parentNode->insertBefore( $newNode, $node );
-
-			$this->removeNode( $node );
+			$node->parentNode->replaceChild( $newNode, $node );
 		}
 	}
 
