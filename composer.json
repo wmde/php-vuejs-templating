@@ -2,6 +2,12 @@
 	"name": "wmde/php-vuejs-templating",
 	"description": "PHP implementation of Vue.js templating engine",
 	"type": "library",
+	"authors": [
+		{
+			"name": "Aleksey Bekh-Ivanov"
+		}
+	],
+	"license": "LGPL-2.1",
 	"require": {
 		"php": ">=5.5.9"
 	},
@@ -25,7 +31,6 @@
 			"vendor/wmde/hamcrest-html-matchers/src/functions.php"
 		]
 	},
-	"license": "LGPLv2",
 	"scripts": {
 		"test": [
 			"composer validate --no-interaction",
