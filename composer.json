@@ -2,6 +2,11 @@
 	"name": "wmde/php-vuejs-templating",
 	"description": "PHP implementation of Vue.js templating engine",
 	"type": "library",
+	"authors": [
+		{
+			"name": "Aleksey Bekh-Ivanov"
+		}
+	],
 	"require": {
 		"php": ">=5.5.9"
 	},
