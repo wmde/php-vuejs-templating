@@ -17,6 +17,7 @@ class FilterParser {
 
 	/**
 	 * @param string $exp
+	 *
 	 * @return ParseResult
 	 */
 	public function parse( $exp ) {

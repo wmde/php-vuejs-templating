@@ -3,6 +3,7 @@
 namespace WMDE\VueJsTemplating\JsParsing;
 
 class StringLiteral implements ParsedExpression {
+
 	/**
 	 * @var string
 	 */
@@ -14,7 +15,8 @@ class StringLiteral implements ParsedExpression {
 
 	/**
 	 * @param array $data
-	 * @return mixed
+	 *
+	 * @return string
 	 */
 	public function evaluate( array $data ) {
 		return $this->string;

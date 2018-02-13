@@ -3,6 +3,7 @@
 namespace WMDE\VueJsTemplating\JsParsing;
 
 class FilterApplication implements ParsedExpression {
+
 	/**
 	 * @var callable
 	 */
@@ -25,6 +26,7 @@ class FilterApplication implements ParsedExpression {
 
 	/**
 	 * @param array $data
+	 *
 	 * @return mixed
 	 */
 	public function evaluate( array $data ) {

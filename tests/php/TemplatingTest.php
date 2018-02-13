@@ -297,6 +297,7 @@ class TemplatingTest extends PHPUnit_Framework_TestCase {
 	 * @param string $template HTML
 	 * @param array $data
 	 * @param callable[] $filters
+	 *
 	 * @return string
 	 */
 	private function createAndRender( $template, array $data, array $filters = [] ) {

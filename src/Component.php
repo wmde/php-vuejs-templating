@@ -47,6 +47,7 @@ class Component {
 
 	/**
 	 * @param array $data
+	 *
 	 * @return string
 	 */
 	public function render( array $data ) {
@@ -60,6 +61,7 @@ class Component {
 
 	/**
 	 * @param string $template HTML
+	 *
 	 * @return DOMDocument
 	 */
 	private function parseHtml( $template ) {
@@ -84,6 +86,7 @@ class Component {
 
 	/**
 	 * @param DOMDocument $document
+	 *
 	 * @return DOMElement
 	 * @throws Exception
 	 */
@@ -120,9 +123,6 @@ class Component {
 		}
 	}
 
-	/**
-	 * @param DOMNode $node
-	 */
 	private function stripEventHandlers( DOMNode $node ) {
 		if ( $this->isTextNode( $node ) ) {
 			return;
@@ -272,6 +272,7 @@ class Component {
 	/**
 	 * @param string $expression
 	 * @param array $data
+	 *
 	 * @return bool
 	 */
 	private function evaluateExpression( $expression, array $data ) {
@@ -284,6 +285,7 @@ class Component {
 
 	/**
 	 * @param DOMNode $node
+	 *
 	 * @return bool
 	 */
 	private function isTextNode( DOMNode $node ) {

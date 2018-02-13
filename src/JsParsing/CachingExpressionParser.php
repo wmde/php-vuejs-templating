@@ -3,10 +3,12 @@
 namespace WMDE\VueJsTemplating\JsParsing;
 
 class CachingExpressionParser implements JsExpressionParser {
+
 	/**
 	 * @var JsExpressionParser
 	 */
 	private $parser;
+
 	/**
 	 * @var ParsedExpression[] Indexed by expression string
 	 */
@@ -18,6 +20,7 @@ class CachingExpressionParser implements JsExpressionParser {
 
 	/**
 	 * @param string $expression
+	 *
 	 * @return ParsedExpression
 	 */
 	public function parse( $expression ) {
@@ -33,6 +36,7 @@ class CachingExpressionParser implements JsExpressionParser {
 
 	/**
 	 * @param string $expression
+	 *
 	 * @return string
 	 */
 	protected function normalizeExpression( $expression ) {

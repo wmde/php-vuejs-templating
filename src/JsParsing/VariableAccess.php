@@ -3,6 +3,7 @@
 namespace WMDE\VueJsTemplating\JsParsing;
 
 class VariableAccess implements ParsedExpression {
+
 	/**
 	 * @var string[]
 	 */
@@ -14,6 +15,7 @@ class VariableAccess implements ParsedExpression {
 
 	/**
 	 * @param array $data
+	 *
 	 * @return mixed
 	 */
 	public function evaluate( array $data ) {

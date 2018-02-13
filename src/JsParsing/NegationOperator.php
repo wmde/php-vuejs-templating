@@ -15,7 +15,8 @@ class NegationOperator implements ParsedExpression {
 
 	/**
 	 * @param array $data
-	 * @return mixed
+	 *
+	 * @return bool
 	 */
 	public function evaluate( array $data ) {
 		return !$this->expression->evaluate( $data );

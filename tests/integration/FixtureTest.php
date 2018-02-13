@@ -68,6 +68,7 @@ class FixtureTest extends PHPUnit_Framework_TestCase {
 	/**
 	 * @param DOMDocument $document
 	 * @param string $elementId
+	 *
 	 * @return string HTML
 	 */
 	private function getContents( DOMDocument $document, $elementId ) {
