@@ -2,7 +2,6 @@
 
 namespace WMDE\VueJsTemplating\FilterExpressionParsing;
 
-
 class FilterParser {
 
 	const VALID_DIVISION_CHAR_REGEX = '/[\w).+\-_$\]]/';
@@ -31,31 +30,36 @@ class FilterParser {
 		$currentFilterStart = 0;
 		$c = null;
 		$prev = null;
-		$pos= null;
+		$pos = null;
 
 		$this->resetState();
 
 		$len = strlen( $exp );
-		for ( $pos = 0; $pos < $len; $pos++) {
+		for ( $pos = 0; $pos < $len; $pos++ ) {
 			$prev = $c;
 			$c = $exp[$pos];
-			if ($inSingle) {
+			if ( $inSingle ) {
 				if ( $c === "'" && $prev !== '\\' ) {
 					$inSingle = false;
 				}
-			} else if ($inDouble) {
-				if ($c === '"' && $prev !== '\\') { $inDouble = false; }
-			} else if ($inTemplateString) {
-				if ($c === '`' && $prev !== '\\') { $inTemplateString = false; }
-			} else if ($inRegex) {
-				if ($c === '/' && $prev !== '\\') { $inRegex = false; }
-			} else if (
-				$c === '|' &&
+			} elseif ( $inDouble ) {
+				if ( $c === '"' && $prev !== '\\' ) {
+					$inDouble = false;
+				}
+			} elseif ( $inTemplateString ) {
+				if ( $c === '`' && $prev !== '\\' ) {
+					$inTemplateString = false;
+				}
+			} elseif ( $inRegex ) {
+				if ( $c === '/' && $prev !== '\\' ) {
+					$inRegex = false;
+				}
+			} elseif ( $c === '|' &&
 				$exp[$pos + 1] !== '|' &&
 				$exp[$pos - 1] !== '|' &&
 				!$curly && !$square && !$paren
 			) {
-				if (!$this->nowParsingFilterList) {
+				if ( !$this->nowParsingFilterList ) {
 					$this->finishExpression( $exp, $pos );
 					$currentFilterStart = $pos + 1;
 				} else {
@@ -66,10 +70,16 @@ class FilterParser {
 			} elseif ( $c === ',' && !$this->nowParsingFilterList && !$curly && !$square && !$paren ) {
 				$this->finishExpression( $exp, $pos );
 			} else {
-				switch ($c) {
-					case '"': $inDouble = true; break;
-					case "'": $inSingle = true; break;
-					case '`': $inTemplateString = true; break;
+				switch ( $c ) {
+					case '"':
+						$inDouble = true;
+						break;
+					case "'":
+						$inSingle = true;
+						break;
+					case '`':
+						$inTemplateString = true;
+						break;
 					case '(':
 						if ( $this->nowParsingFilterList && $paren === 0 ) {
 							$this->filterArgStart = $pos + 1;
@@ -83,32 +93,41 @@ class FilterParser {
 							$this->filterArgEnd = $pos - 1;
 						}
 						break;
-					case '[': $square++; break;
-					case ']': $square--; break;
-					case '{': $curly++; break;
-					case '}': $curly--; break;
+					case '[':
+						$square++;
+						break;
+					case ']':
+						$square--;
+						break;
+					case '{':
+						$curly++;
+						break;
+					case '}':
+						$curly--;
+						break;
 				}
-				if ($c === '/') {
-					$j = $pos - 1;
+				if ( $c === '/' ) {
 					$p = null;
 					// find first non-whitespace prev char
-					for (; $j >= 0; $j--) {
+					for ( $j = $pos - 1; $j >= 0; $j-- ) {
 						$p = $exp[$j];
-						if ($p !== ' ') { break; }
+						if ( $p !== ' ' ) {
+							break;
+						}
 					}
 
-					if (!$p || !preg_match( self::VALID_DIVISION_CHAR_REGEX, $p)) {
+					if ( !$p || !preg_match( self::VALID_DIVISION_CHAR_REGEX, $p ) ) {
 						$inRegex = true;
 					}
 				}
 			}
 		}
 
-		if (!$this->nowParsingFilterList) {
+		if ( !$this->nowParsingFilterList ) {
 			$this->finishExpression( $exp, $pos );
 		}
 
-		if ($currentFilterStart !== 0) {
+		if ( $currentFilterStart !== 0 ) {
 			$this->pushFilter( $exp, $pos, $currentFilterStart );
 		}
 
@@ -123,15 +142,21 @@ class FilterParser {
 			$args = [];
 		} else {
 			$filterName = substr( $filterBody, 0, $openingParenthesisPos );
-			$argString = substr( $exp, $this->filterArgStart, $this->filterArgEnd - $this->filterArgStart + 1 );
-			$args = (new self())->parse( $argString )->expressions();
+			$argString = substr(
+				$exp,
+				$this->filterArgStart,
+				$this->filterArgEnd - $this->filterArgStart + 1
+			);
+			$args = ( new self() )->parse( $argString )->expressions();
 		}
 
 		$this->filters[] = new FilterCall( $filterName, $args );
 	}
 
 	private function finishExpression( $exp, $pos ) {
-		$this->expressions[] = trim( substr( $exp, $this->expressionStart, $pos - $this->expressionStart ) );
+		$this->expressions[] = trim(
+			substr( $exp, $this->expressionStart, $pos - $this->expressionStart )
+		);
 		$this->expressionStart = $pos + 1;
 	}
 

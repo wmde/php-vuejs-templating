@@ -8,7 +8,7 @@ class StringLiteral implements ParsedExpression {
 	 */
 	private $string;
 
-	public function __construct($string) {
+	public function __construct( $string ) {
 		$this->string = $string;
 	}
 
@@ -19,4 +19,5 @@ class StringLiteral implements ParsedExpression {
 	public function evaluate( array $data ) {
 		return $this->string;
 	}
+
 }

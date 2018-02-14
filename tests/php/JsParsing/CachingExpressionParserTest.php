@@ -17,7 +17,7 @@ class CachingExpressionParserTest extends \PHPUnit_Framework_TestCase {
 
 		$internalParser = $this->prophesize( JsExpressionParser::class );
 		$internalParser->parse( "'some string'" )->willReturn( $expectedExpression );
-		$cachingExpressionParser = new CachingExpressionParser($internalParser->reveal());
+		$cachingExpressionParser = new CachingExpressionParser( $internalParser->reveal() );
 
 		$result = $cachingExpressionParser->parse( "'some string'" );
 
@@ -29,7 +29,7 @@ class CachingExpressionParserTest extends \PHPUnit_Framework_TestCase {
 	 * @test
 	 */
 	public function parse_SameExpression_GetExactlySameObject() {
-		$cachingExpressionParser = new CachingExpressionParser(new BasicJsExpressionParser());
+		$cachingExpressionParser = new CachingExpressionParser( new BasicJsExpressionParser() );
 
 		$expression1 = $cachingExpressionParser->parse( "'some string'" );
 		$expression2 = $cachingExpressionParser->parse( "'some string'" );
@@ -41,7 +41,7 @@ class CachingExpressionParserTest extends \PHPUnit_Framework_TestCase {
 	 * @test
 	 */
 	public function parse_IgnoresSurroundingSpaces_GetExactlySameObject() {
-		$cachingExpressionParser = new CachingExpressionParser(new BasicJsExpressionParser());
+		$cachingExpressionParser = new CachingExpressionParser( new BasicJsExpressionParser() );
 
 		$expression1 = $cachingExpressionParser->parse( "'some string'" );
 		$expression2 = $cachingExpressionParser->parse( " 'some string' " );

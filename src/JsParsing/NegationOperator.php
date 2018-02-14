@@ -20,4 +20,5 @@ class NegationOperator implements ParsedExpression {
 	public function evaluate( array $data ) {
 		return !$this->expression->evaluate( $data );
 	}
+
 }

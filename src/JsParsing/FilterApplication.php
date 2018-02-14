@@ -29,7 +29,7 @@ class FilterApplication implements ParsedExpression {
 	 */
 	public function evaluate( array $data ) {
 		$arguments = array_map(
-			function (ParsedExpression $e) use ($data) {
+			function ( ParsedExpression $e ) use ( $data ) {
 				return $e->evaluate( $data );
 			},
 			$this->argumentExpressions
@@ -38,4 +38,5 @@ class FilterApplication implements ParsedExpression {
 		return call_user_func_array( $this->filter, $arguments );
 		// TODO: Implement evaluate() method.
 	}
+
 }
