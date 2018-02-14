@@ -6,6 +6,7 @@ class BasicJsExpressionParser implements JsExpressionParser {
 
 	/**
 	 * @param string $expression
+	 *
 	 * @return ParsedExpression
 	 */
 	public function parse( $expression ) {
@@ -22,6 +23,7 @@ class BasicJsExpressionParser implements JsExpressionParser {
 
 	/**
 	 * @param string $expression
+	 *
 	 * @return string
 	 */
 	protected function normalizeExpression( $expression ) {

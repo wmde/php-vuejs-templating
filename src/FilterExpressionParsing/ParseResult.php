@@ -29,7 +29,7 @@ class ParseResult {
 	}
 
 	/**
-	 * @return \string[]
+	 * @return string[]
 	 */
 	public function expressions() {
 		return $this->expressions;
@@ -45,6 +45,7 @@ class ParseResult {
 	/**
 	 * @param JsExpressionParser $expressionParser
 	 * @param callable[] $filters Indexed by name
+	 *
 	 * @return ParsedExpression
 	 */
 	public function toExpression( JsExpressionParser $expressionParser, array $filters ) {
