@@ -10,6 +10,7 @@ use DOMNode;
 use DOMNodeList;
 use DOMText;
 use Exception;
+use LibXMLError;
 
 use WMDE\VueJsTemplating\FilterExpressionParsing\FilterParser;
 use WMDE\VueJsTemplating\JsParsing\BasicJsExpressionParser;
@@ -65,6 +66,7 @@ class Component {
 	 * @return DOMDocument
 	 */
 	private function parseHtml( $template ) {
+		$entityLoaderDisabled = libxml_disable_entity_loader( true );
 		$internalErrors = libxml_use_internal_errors( true );
 		$document = new DOMDocument();
 
@@ -73,9 +75,14 @@ class Component {
 			//TODO Test failure
 		}
 
+		/** @var LibXMLError[] $errors */
 		$errors = libxml_get_errors();
 		libxml_clear_errors();
+
+		// Restore previous state
 		libxml_use_internal_errors( $internalErrors );
+		libxml_disable_entity_loader( $entityLoaderDisabled );
+
 		foreach ( $errors as $error ) {
 			//TODO html5 tags can fail parsing
 			//TODO Throw an exception
@@ -243,8 +250,7 @@ class Component {
 	}
 
 	private function appendHTML( DOMNode $parent, $source ) {
-		$tmpDoc = new DOMDocument();
-		$tmpDoc->loadHTML( $source );
+		$tmpDoc = $this->parseHtml( $source );
 		foreach ( $tmpDoc->getElementsByTagName( 'body' )->item( 0 )->childNodes as $node ) {
 			$node = $parent->ownerDocument->importNode( $node, true );
 			$parent->appendChild( $node );
