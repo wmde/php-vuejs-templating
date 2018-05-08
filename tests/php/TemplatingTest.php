@@ -3,10 +3,10 @@
 namespace WMDE\VueJsTemplating\Test;
 
 use Exception;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use WMDE\VueJsTemplating\Templating;
 
-class TemplatingTest extends PHPUnit_Framework_TestCase {
+class TemplatingTest extends TestCase {
 
 	/**
 	 * @test

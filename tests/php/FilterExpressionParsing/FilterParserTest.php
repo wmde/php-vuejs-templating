@@ -2,11 +2,12 @@
 
 namespace WMDE\VueJsTemplating\Test\FilterExpressionParsing;
 
+use PHPUnit\Framework\TestCase;
 use WMDE\VueJsTemplating\FilterExpressionParsing\FilterCall;
 use WMDE\VueJsTemplating\FilterExpressionParsing\FilterParser;
 use WMDE\VueJsTemplating\FilterExpressionParsing\ParseResult;
 
-class FilterParserTest extends \PHPUnit_Framework_TestCase {
+class FilterParserTest extends TestCase {
 
 	/**
 	 * @test

@@ -2,11 +2,12 @@
 
 namespace WMDE\VueJsTemplating\Test\FilterExpressionParsing;
 
+use PHPUnit\Framework\TestCase;
 use WMDE\VueJsTemplating\FilterExpressionParsing\FilterCall;
 use WMDE\VueJsTemplating\FilterExpressionParsing\ParseResult;
 use WMDE\VueJsTemplating\JsParsing\BasicJsExpressionParser;
 
-class ParseResultTest extends \PHPUnit_Framework_TestCase {
+class ParseResultTest extends TestCase {
 
 	private $defaultFilters;
 

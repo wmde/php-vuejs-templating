@@ -17,8 +17,8 @@
 		}
 	},
 	"require-dev": {
-		"phpunit/phpunit": "^4.0",
-		"wikibase/wikibase-codesniffer": "^0.3.0",
+		"phpunit/phpunit": "^4.8.35",
+		"wikibase/wikibase-codesniffer": "^0.4.1",
 		"wmde/hamcrest-html-matchers": "^0.1.0"
 	},
 	"autoload-dev": {

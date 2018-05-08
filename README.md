@@ -13,7 +13,7 @@ The recommended way of installing the library is using [Composer](https://getcom
 e.g. by adding the following line to the `require` section of the `composer.json` file:
 
 ```
-	"wmde/php-vuejs-templating": "~1.0"
+	"wmde/php-vuejs-templating": "^1.0.1"
 ```
 
 ## Tests

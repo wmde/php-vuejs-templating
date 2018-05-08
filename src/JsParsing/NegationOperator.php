@@ -2,6 +2,8 @@
 
 namespace WMDE\VueJsTemplating\JsParsing;
 
+use RuntimeException;
+
 class NegationOperator implements ParsedExpression {
 
 	/**
@@ -16,6 +18,7 @@ class NegationOperator implements ParsedExpression {
 	/**
 	 * @param array $data
 	 *
+	 * @throws RuntimeException
 	 * @return bool
 	 */
 	public function evaluate( array $data ) {
