@@ -5,11 +5,11 @@ namespace WMDE\VueJsTemplating\IntegrationTest;
 use DirectoryIterator;
 use DOMDocument;
 use DOMNode;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use WMDE\VueJsTemplating\Templating;
 
-class FixtureTest extends PHPUnit_Framework_TestCase {
+class FixtureTest extends TestCase {
 
 	/**
 	 * @test

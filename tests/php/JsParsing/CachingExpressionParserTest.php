@@ -2,12 +2,13 @@
 
 namespace WMDE\VueJsTemplating\Test\JsParsing;
 
+use PHPUnit\Framework\TestCase;
 use WMDE\VueJsTemplating\JsParsing\BasicJsExpressionParser;
 use WMDE\VueJsTemplating\JsParsing\CachingExpressionParser;
 use WMDE\VueJsTemplating\JsParsing\JsExpressionParser;
 use WMDE\VueJsTemplating\JsParsing\StringLiteral;
 
-class CachingExpressionParserTest extends \PHPUnit_Framework_TestCase {
+class CachingExpressionParserTest extends TestCase {
 
 	/**
 	 * @test

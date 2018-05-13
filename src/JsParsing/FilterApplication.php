@@ -2,6 +2,8 @@
 
 namespace WMDE\VueJsTemplating\JsParsing;
 
+use RuntimeException;
+
 class FilterApplication implements ParsedExpression {
 
 	/**
@@ -27,6 +29,7 @@ class FilterApplication implements ParsedExpression {
 	/**
 	 * @param array $data
 	 *
+	 * @throws RuntimeException
 	 * @return mixed
 	 */
 	public function evaluate( array $data ) {

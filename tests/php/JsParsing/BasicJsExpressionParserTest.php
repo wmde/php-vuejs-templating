@@ -2,9 +2,10 @@
 
 namespace WMDE\VueJsTemplating\Test\JsParsing;
 
+use PHPUnit\Framework\TestCase;
 use WMDE\VueJsTemplating\JsParsing\BasicJsExpressionParser;
 
-class BasicJsExpressionParserTest extends \PHPUnit_Framework_TestCase {
+class BasicJsExpressionParserTest extends TestCase {
 
 	/**
 	 * @test
