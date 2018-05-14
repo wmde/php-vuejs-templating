@@ -22,4 +22,4 @@ The library comes with a set of PHPUnit tests, that include unit tests of librar
 (`tests/php` directory), and also integration tests of rendering the template syntax elements used
 in the Wikibase Lexeme extension (`tests/integration` directory).
 
-Tests could run by executing `composer phpunit` command.
+All tests (including code sniffers) can be run with the `composer test` command.
