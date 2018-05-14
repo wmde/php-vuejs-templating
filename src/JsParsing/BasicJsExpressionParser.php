@@ -11,10 +11,10 @@ class BasicJsExpressionParser implements JsExpressionParser {
 	 */
 	public function parse( $expression ) {
 		$expression = $this->normalizeExpression( $expression );
-		if ( strpos( $expression, '!' ) === 0 ) { // ! operator application
+		if ( strncmp( $expression, '!', 1 ) === 0 ) {
 			return new NegationOperator( $this->parse( substr( $expression, 1 ) ) );
-		} elseif ( strpos( $expression, "'" ) === 0 ) {
-			return new StringLiteral( substr( $expression, 1, strlen( $expression ) - 2 ) );
+		} elseif ( strncmp( $expression, "'", 1 ) === 0 ) {
+			return new StringLiteral( substr( $expression, 1, -1 ) );
 		} else {
 			$parts = explode( '.', $expression );
 			return new VariableAccess( $parts );

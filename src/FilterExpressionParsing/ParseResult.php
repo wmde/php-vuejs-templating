@@ -50,7 +50,7 @@ class ParseResult {
 	 * @return ParsedExpression
 	 */
 	public function toExpression( JsExpressionParser $expressionParser, array $filters ) {
-		if ( count( $this->filterCalls ) === 0 ) {
+		if ( $this->filterCalls === [] ) {
 			return $expressionParser->parse( $this->expressions[0] );
 		}
 
