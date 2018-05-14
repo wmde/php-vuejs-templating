@@ -1,6 +1,6 @@
 <phpunit>
     <testsuites>
-        <testsuite name="WikibaseTests">
+        <testsuite name="PhpVuejsTemplating">
             <directory>tests/</directory>
         </testsuite>
     </testsuites>
