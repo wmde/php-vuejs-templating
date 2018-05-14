@@ -135,6 +135,11 @@ class FilterParser {
 		return new ParseResult( $this->expressions, $this->filters );
 	}
 
+	/**
+	 * @param string $exp
+	 * @param int $pos
+	 * @param int $currentFilterStart
+	 */
 	private function pushFilter( $exp, $pos, $currentFilterStart ) {
 		$filterBody = trim( substr( $exp, $currentFilterStart, $pos - $currentFilterStart ) );
 		$openingParenthesisPos = strpos( $filterBody, '(' );
@@ -154,6 +159,10 @@ class FilterParser {
 		$this->filters[] = new FilterCall( $filterName, $args );
 	}
 
+	/**
+	 * @param string $exp
+	 * @param int $pos
+	 */
 	private function finishExpression( $exp, $pos ) {
 		$this->expressions[] = trim(
 			substr( $exp, $this->expressionStart, $pos - $this->expressionStart )

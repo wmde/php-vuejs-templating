@@ -21,7 +21,6 @@ class FilterApplication implements ParsedExpression {
 	 * @param ParsedExpression[] $argumentExpressions
 	 */
 	public function __construct( callable $filter, array $argumentExpressions ) {
-
 		$this->filter = $filter;
 		$this->argumentExpressions = $argumentExpressions;
 	}

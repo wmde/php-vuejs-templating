@@ -47,7 +47,6 @@ class TemplatingTest extends TestCase {
 	 * @test
 	 */
 	public function templateHasOnClickHandlerInSomeChildNode_RemoveHandlerFormOutput() {
-
 		$result = $this->createAndRender( '<p><a v-on:click="doStuff"></a></p>', [] );
 
 		assertThat( $result, is( equalTo( '<p><a></a></p>' ) ) );
