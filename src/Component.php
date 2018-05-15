@@ -15,6 +15,7 @@ use LibXMLError;
 use WMDE\VueJsTemplating\FilterExpressionParsing\FilterParser;
 use WMDE\VueJsTemplating\JsParsing\BasicJsExpressionParser;
 use WMDE\VueJsTemplating\JsParsing\CachingExpressionParser;
+use WMDE\VueJsTemplating\JsParsing\JsExpressionParser;
 
 class Component {
 
@@ -31,7 +32,7 @@ class Component {
 	private $filters = [];
 
 	/**
-	 * @var BasicJsExpressionParser
+	 * @var JsExpressionParser
 	 */
 	private $expressionParser;
 
@@ -49,7 +50,7 @@ class Component {
 	/**
 	 * @param array $data
 	 *
-	 * @return string
+	 * @return string HTML
 	 */
 	public function render( array $data ) {
 		$document = $this->parseHtml( $this->template );

@@ -14,9 +14,9 @@ class StringLiteral implements ParsedExpression {
 	}
 
 	/**
-	 * @param array $data
+	 * @param array $data ignored
 	 *
-	 * @return string
+	 * @return string as provided on construction time
 	 */
 	public function evaluate( array $data ) {
 		return $this->string;
