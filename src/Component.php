@@ -99,13 +99,13 @@ class Component {
 	 * @throws Exception
 	 */
 	private function getRootNode( DOMDocument $document ) {
-		$rootNodes = iterator_to_array( $document->documentElement->childNodes->item( 0 )->childNodes );
+		$rootNodes = $document->documentElement->childNodes->item( 0 )->childNodes;
 
-		if ( count( $rootNodes ) > 1 ) {
+		if ( $rootNodes->length > 1 ) {
 			throw new Exception( 'Template should have only one root node' );
 		}
 
-		return $rootNodes[0];
+		return $rootNodes->item( 0 );
 	}
 
 	/**
@@ -172,7 +172,7 @@ class Component {
 	private function handleAttributeBinding( DOMElement $node, array $data ) {
 		/** @var DOMAttr $attribute */
 		foreach ( iterator_to_array( $node->attributes ) as $attribute ) {
-			if ( !preg_match( '/^:[\-\_\w]+$/', $attribute->name ) ) {
+			if ( !preg_match( '/^:[\w-]+$/', $attribute->name ) ) {
 				continue;
 			}
 
