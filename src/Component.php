@@ -69,7 +69,7 @@ class Component {
 	private function parseHtml( $html ) {
 		$entityLoaderDisabled = libxml_disable_entity_loader( true );
 		$internalErrors = libxml_use_internal_errors( true );
-		$document = new DOMDocument( null, 'UTF-8' );
+		$document = new DOMDocument( '1.0', 'UTF-8' );
 
 		// Ensure $html is treated as UTF-8, see https://stackoverflow.com/a/8218649
 		if ( !$document->loadHTML( '<?xml encoding="utf-8" ?>' . $html ) ) {
