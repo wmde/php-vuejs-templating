@@ -73,6 +73,24 @@ class TemplatingTest extends TestCase {
 	/**
 	 * @test
 	 */
+	public function templateWithVariableAndDiacritcsInValue_ReplacesVariableWithEncodedValue() {
+		$result = $this->createAndRender( '<p>{{value}}</p>', [ 'value' => 'inglés' ] );
+
+		assertThat( $result, is( equalTo( '<p>inglés</p>' ) ) );
+	}
+
+	/**
+	 * @test
+	 */
+	public function templateWithVariableAndValueInKorean_ReplacesVariableWithEncodedValue() {
+		$result = $this->createAndRender( '<p>{{value}}</p>', [ 'value' => '한국어' ] );
+
+		assertThat( $result, is( equalTo( '<p>한국어</p>' ) ) );
+	}
+
+	/**
+	 * @test
+	 */
 	public function templateWithMustacheVariable_VariableIsUndefined_ThrowsException() {
 		$this->setExpectedException( Exception::class );
 		$this->createAndRender( '<p>{{value}}</p>', [] );
