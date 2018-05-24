@@ -12,4 +12,4 @@ sudo: false
 
 install: travis_retry composer install --prefer-source
 
-script: composer phpunit
+script: composer test
