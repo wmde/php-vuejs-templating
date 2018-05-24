@@ -19,16 +19,16 @@
                     <td>
                     </td>
                     <td>
-                        <button type="button" class="wikibase-lexeme-sense-glosses-control" v-on:click="add" :disabled="isSaving">+ {{&apos;wikibase-add&apos;|message}}</button>
+                        <button type="button" class="wikibase-lexeme-sense-glosses-control" v-on:click="add" :disabled="isSaving">+ {{'wikibase-add'|message}}</button>
                     </td>
                 </tr>
                 </tfoot>
             </table>
         </div>
         <div class="wikibase-lexeme-sense-glosses-controls">
-            <button type="button" class="wikibase-lexeme-sense-glosses-control" v-if="!inEditMode" v-on:click="edit" :disabled="isSaving">{{&apos;wikibase-edit&apos;|message}}</button>
-            <button type="button" class="wikibase-lexeme-sense-glosses-control" v-if="inEditMode" v-on:click="save" :disabled="isSaving">{{&apos;wikibase-save&apos;|message}}</button>
-            <button type="button" class="wikibase-lexeme-sense-glosses-control" v-if="inEditMode" v-on:click="cancel" :disabled="isSaving">{{&apos;wikibase-cancel&apos;|message}}</button>
+            <button type="button" class="wikibase-lexeme-sense-glosses-control" v-if="!inEditMode" v-on:click="edit" :disabled="isSaving">{{'wikibase-edit'|message}}</button>
+            <button type="button" class="wikibase-lexeme-sense-glosses-control" v-if="inEditMode" v-on:click="save" :disabled="isSaving">{{'wikibase-save'|message}}</button>
+            <button type="button" class="wikibase-lexeme-sense-glosses-control" v-if="inEditMode" v-on:click="cancel" :disabled="isSaving">{{'wikibase-cancel'|message}}</button>
         </div>
     </div>
 </template>
