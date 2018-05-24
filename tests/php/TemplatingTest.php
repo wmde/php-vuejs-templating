@@ -91,6 +91,44 @@ class TemplatingTest extends TestCase {
 	/**
 	 * @test
 	 */
+	public function templateWithVhtmlVariable_ReplacesVariableWithGivenValue() {
+		$result = $this->createAndRender(
+			'<div><div v-html="value"></div></div>',
+			[ 'value' => '<p>some value</p>' ]
+		);
+
+		assertThat( $result, is( equalTo( '<div><div><p>some value</p></div></div>' ) ) );
+	}
+
+	/**
+	 * @test
+	 */
+	public function templateWithVhtmlAndDiacritcsInValue_ReplacesVariableWithEncodedValue() {
+		$this->markTestSkipped( 'UTF-8 data is currently broken' );
+		$result = $this->createAndRender(
+			'<div><div v-html="value"></div></div>',
+			[ 'value' => '<p>inglés</p>' ]
+		);
+
+		assertThat( $result, is( equalTo( '<div><div><p>inglés</p></div></div>' ) ) );
+	}
+
+	/**
+	 * @test
+	 */
+	public function templateWithVhtmlAndValueInKorean_ReplacesVariableWithEncodedValue() {
+		$this->markTestSkipped( 'UTF-8 data is currently broken' );
+		$result = $this->createAndRender(
+			'<div><div v-html="value"></div></div>',
+			[ 'value' => '<p>한국어</p>' ]
+		);
+
+		assertThat( $result, is( equalTo( '<div><div><p>한국어</p></div></div>' ) ) );
+	}
+
+	/**
+	 * @test
+	 */
 	public function templateWithMustacheVariable_VariableIsUndefined_ThrowsException() {
 		$this->setExpectedException( Exception::class );
 		$this->createAndRender( '<p>{{value}}</p>', [] );
