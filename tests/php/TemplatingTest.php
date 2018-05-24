@@ -104,7 +104,6 @@ class TemplatingTest extends TestCase {
 	 * @test
 	 */
 	public function templateWithVhtmlAndDiacritcsInValue_ReplacesVariableWithEncodedValue() {
-		$this->markTestSkipped( 'UTF-8 data is currently broken' );
 		$result = $this->createAndRender(
 			'<div><div v-html="value"></div></div>',
 			[ 'value' => '<p>inglés</p>' ]
@@ -117,7 +116,6 @@ class TemplatingTest extends TestCase {
 	 * @test
 	 */
 	public function templateWithVhtmlAndValueInKorean_ReplacesVariableWithEncodedValue() {
-		$this->markTestSkipped( 'UTF-8 data is currently broken' );
 		$result = $this->createAndRender(
 			'<div><div v-html="value"></div></div>',
 			[ 'value' => '<p>한국어</p>' ]

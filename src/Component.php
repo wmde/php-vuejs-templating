@@ -62,17 +62,17 @@ class Component {
 	}
 
 	/**
-	 * @param string $template HTML
+	 * @param string $html HTML
 	 *
 	 * @return DOMDocument
 	 */
-	private function parseHtml( $template ) {
+	private function parseHtml( $html ) {
 		$entityLoaderDisabled = libxml_disable_entity_loader( true );
 		$internalErrors = libxml_use_internal_errors( true );
-		$document = new DOMDocument();
+		$document = new DOMDocument( null, 'UTF-8' );
 
-		//TODO Unicode characters in template will not work correctly. Fix.
-		if ( !$document->loadHTML( $template ) ) {
+		// Ensure $html is treated as UTF-8, see https://stackoverflow.com/a/8218649
+		if ( !$document->loadHTML( '<?xml encoding="utf-8" ?>' . $html ) ) {
 			//TODO Test failure
 		}
 
