@@ -30,8 +30,7 @@ readFixtureDir().then( function ( files ) {
 function extractDataFromFixture( html ) {
 	const $ = cheerio.load( html );
 
-	const template = $( '#template' ).html().trim().replace(/\&apos;/g, "'"); //Replacing '&apos;' as soon as Vue can't handle it
-	console.log( template );
+	const template = cheerio.load( $( '#template' ).html() ).html( { decodeEntities: false } ).trim();
 	const data = JSON.parse( $( '#data' ).html() );
 
 	return { template: template, data: data };
@@ -62,7 +61,7 @@ function removeServerRenderedDataAttribute( html ) {
 		 $(this).removeAttr('data-server-rendered');
 	});
 
-	return $.html();
+	return $.html({ decodeEntities: false });
 }
 
 function readFile( filePath ) {
@@ -109,6 +108,6 @@ function saveResultToFile(filePath, renderResult) {
 		const $resultElement = $( '<div id="result"></div>' ).html( "\n\t" + generatedComment + "\n\t" + renderResult + "\n" );
 		$.root().children().last().after( $resultElement ).after("\n");
 
-		return saveFile( filePath, $.html().trim() + "\n" );
+		return saveFile( filePath, $.html({ decodeEntities: false }).trim() + "\n" );
 	} );
 }

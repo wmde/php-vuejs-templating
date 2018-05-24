@@ -73,6 +73,60 @@ class TemplatingTest extends TestCase {
 	/**
 	 * @test
 	 */
+	public function templateWithVariableAndDiacritcsInValue_ReplacesVariableWithEncodedValue() {
+		$result = $this->createAndRender( '<p>{{value}}</p>', [ 'value' => 'inglés' ] );
+
+		assertThat( $result, is( equalTo( '<p>inglés</p>' ) ) );
+	}
+
+	/**
+	 * @test
+	 */
+	public function templateWithVariableAndValueInKorean_ReplacesVariableWithEncodedValue() {
+		$result = $this->createAndRender( '<p>{{value}}</p>', [ 'value' => '한국어' ] );
+
+		assertThat( $result, is( equalTo( '<p>한국어</p>' ) ) );
+	}
+
+	/**
+	 * @test
+	 */
+	public function templateWithVhtmlVariable_ReplacesVariableWithGivenValue() {
+		$result = $this->createAndRender(
+			'<div><div v-html="value"></div></div>',
+			[ 'value' => '<p>some value</p>' ]
+		);
+
+		assertThat( $result, is( equalTo( '<div><div><p>some value</p></div></div>' ) ) );
+	}
+
+	/**
+	 * @test
+	 */
+	public function templateWithVhtmlAndDiacritcsInValue_ReplacesVariableWithEncodedValue() {
+		$result = $this->createAndRender(
+			'<div><div v-html="value"></div></div>',
+			[ 'value' => '<p>inglés</p>' ]
+		);
+
+		assertThat( $result, is( equalTo( '<div><div><p>inglés</p></div></div>' ) ) );
+	}
+
+	/**
+	 * @test
+	 */
+	public function templateWithVhtmlAndValueInKorean_ReplacesVariableWithEncodedValue() {
+		$result = $this->createAndRender(
+			'<div><div v-html="value"></div></div>',
+			[ 'value' => '<p>한국어</p>' ]
+		);
+
+		assertThat( $result, is( equalTo( '<div><div><p>한국어</p></div></div>' ) ) );
+	}
+
+	/**
+	 * @test
+	 */
 	public function templateWithMustacheVariable_VariableIsUndefined_ThrowsException() {
 		$this->setExpectedException( Exception::class );
 		$this->createAndRender( '<p>{{value}}</p>', [] );
