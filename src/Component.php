@@ -240,10 +240,21 @@ class Component {
 			list( $itemName, $listName ) = explode( ' in ', $node->getAttribute( 'v-for' ) );
 			$node->removeAttribute( 'v-for' );
 
-			foreach ( $data[$listName] as $item ) {
+			if ( preg_match( '/\((?P<itemName>[^,]+)\s*,\s*(?P<keyName>[^\)]+)\)/', $itemName, $matches ) ) {
+				$itemName = $matches['itemName'];
+				$keyName = $matches['keyName'];
+			} else {
+				$keyName = null;
+			}
+
+			foreach ( $data[$listName] as $key => $item ) {
 				$newNode = $node->cloneNode( true );
 				$node->parentNode->insertBefore( $newNode, $node );
-				$this->handleNode( $newNode, array_merge( $data, [ $itemName => $item ] ) );
+				$newData = array_merge( $data, [ $itemName => $item ] );
+				if ( $keyName !== null ) {
+					$newData[$keyName] = $key;
+				}
+				$this->handleNode( $newNode, $newData );
 			}
 
 			$this->removeNode( $node );

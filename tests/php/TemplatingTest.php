@@ -196,6 +196,24 @@ class TemplatingTest extends TestCase {
 		assertThat( $result, is( equalTo( '<p><a>1</a><a>2</a></p>' ) ) );
 	}
 
+	public function testTemplateWithForLoopWithIndex_RendersValuesAndIndices() {
+		$result = $this->createAndRender(
+			'<p><a v-for="(item, index) in list">{{index}}: {{item}}</a></p>',
+			[ 'list' => [ 10, 20 ] ]
+		);
+
+		assertThat( $result, is( equalTo( '<p><a>0: 10</a><a>1: 20</a></p>' ) ) );
+	}
+
+	public function testTemplateWithForLoopWithKey_RendersValuesAndKeys() {
+		$result = $this->createAndRender(
+			'<p><a v-for="(item, key) in list">{{key}}: {{item}}</a></p>',
+			[ 'list' => [ 'ten' => 10, 'twenty' => 20 ] ]
+		);
+
+		assertThat( $result, is( equalTo( '<p><a>ten: 10</a><a>twenty: 20</a></p>' ) ) );
+	}
+
 	public function testTemplateWithAttributeBinding_ConditionIsFalse_AttributeIsNotRendered() {
 		$result = $this->createAndRender( '<p :attr1="condition"></p>', [ 'condition' => false ] );
 
