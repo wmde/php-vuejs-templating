@@ -7,11 +7,14 @@ use WMDE\VueJsTemplating\FilterExpressionParsing\FilterCall;
 use WMDE\VueJsTemplating\FilterExpressionParsing\ParseResult;
 use WMDE\VueJsTemplating\JsParsing\BasicJsExpressionParser;
 
+/**
+ * @covers \WMDE\VueJsTemplating\FilterExpressionParsing\ParseResult
+ */
 class ParseResultTest extends TestCase {
 
 	private $defaultFilters;
 
-	protected function setUp() {
+	protected function setUp(): void {
 		$this->defaultFilters = [
 			'duplicate' => function ( $str ) {
 				return $str . $str;
@@ -28,10 +31,7 @@ class ParseResultTest extends TestCase {
 		parent::setUp();
 	}
 
-	/**
-	 * @test
-	 */
-	public function toExpression_SingleExpressionWithoutFilters_CreatesThisExpression() {
+	public function testToExpression_SingleExpressionWithoutFilters_CreatesThisExpression() {
 		$expressionParser = new BasicJsExpressionParser();
 		$parseResult = new ParseResult( [ "'a'" ], [] );
 
@@ -40,10 +40,7 @@ class ParseResultTest extends TestCase {
 		$this->assertEquals( 'a', $result );
 	}
 
-	/**
-	 * @test
-	 */
-	public function toExpression_SingleExpressionWithFilter_CreatesThisExpression() {
+	public function testToExpression_SingleExpressionWithFilter_CreatesThisExpression() {
 		$expressionParser = new BasicJsExpressionParser();
 		$parseResult = new ParseResult( [ "'a'" ], [ new FilterCall( 'duplicate', [] ) ] );
 
@@ -52,10 +49,7 @@ class ParseResultTest extends TestCase {
 		$this->assertEquals( 'aa', $result );
 	}
 
-	/**
-	 * @test
-	 */
-	public function toExpression_SingleExpressionWithTwoFilters_CreatesThisExpression() {
+	public function testToExpression_SingleExpressionWithTwoFilters_CreatesThisExpression() {
 		$expressionParser = new BasicJsExpressionParser();
 		$parseResult = new ParseResult(
 			[ "'a'" ],
@@ -70,10 +64,7 @@ class ParseResultTest extends TestCase {
 		$this->assertEquals( 'aaaa', $result );
 	}
 
-	/**
-	 * @test
-	 */
-	public function toExpression_SingleExpressionWithFiltersHavingArguments_CreatesThisExpression() {
+	public function testToExpression_SingleExpressionWithFiltersHavingArgs_CreatesThisExpression() {
 		$expressionParser = new BasicJsExpressionParser();
 		$parseResult = new ParseResult(
 			[ "'a'" ],
@@ -88,10 +79,7 @@ class ParseResultTest extends TestCase {
 		$this->assertEquals( 'abc', $result );
 	}
 
-	/**
-	 * @test
-	 */
-	public function toExpression_TwoExpressionWithFilter_CreatesThisExpression() {
+	public function testToExpression_TwoExpressionWithFilter_CreatesThisExpression() {
 		$expressionParser = new BasicJsExpressionParser();
 		$parseResult = new ParseResult(
 			[ "'a'", "'b'" ],

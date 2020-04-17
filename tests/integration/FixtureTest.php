@@ -9,13 +9,15 @@ use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use WMDE\VueJsTemplating\Templating;
 
+/**
+ * @coversNothing
+ */
 class FixtureTest extends TestCase {
 
 	/**
-	 * @test
 	 * @dataProvider provideFixtures
 	 */
-	public function phpRenderingEqualsVueJsRendering( $template, array $data, $expectedResult ) {
+	public function testPhpRenderingEqualsVueJsRendering( $template, array $data, $expectedResult ) {
 		$templating = new Templating();
 		$filters = [
 			'message' => 'strval',

@@ -6,92 +6,65 @@ use Exception;
 use PHPUnit\Framework\TestCase;
 use WMDE\VueJsTemplating\Templating;
 
+/**
+ * @covers \WMDE\VueJsTemplating\Templating
+ */
 class TemplatingTest extends TestCase {
 
-	/**
-	 * @test
-	 */
-	public function justASingleEmptyHtmlElement() {
+	public function testJustASingleEmptyHtmlElement() {
 		$result = $this->createAndRender( '<div></div>', [] );
 
 		assertThat( $result, is( equalTo( '<div></div>' ) ) );
 	}
 
-	/**
-	 * @test
-	 */
-	public function templateHasTwoRootNodes_ThrowsAnException() {
+	public function testTemplateHasTwoRootNodes_ThrowsAnException() {
 		$this->setExpectedException( Exception::class );
 		$this->createAndRender( '<p></p><p></p>', [] );
 	}
 
-	/**
-	 * @test
-	 */
-	public function templateHasOnClickHandler_RemoveHandlerFormOutput() {
+	public function testTemplateHasOnClickHandler_RemoveHandlerFormOutput() {
 		$result = $this->createAndRender( '<div v-on:click="doStuff"></div>', [] );
 
 		assertThat( $result, is( equalTo( '<div></div>' ) ) );
 	}
 
-	/**
-	 * @test
-	 */
-	public function templateHasOnClickHandlerAndPreventDefault_RemoveHandlerFormOutput() {
+	public function testTemplateHasOnClickHandlerAndPreventDefault_RemoveHandlerFormOutput() {
 		$result = $this->createAndRender( '<div v-on:click.prevent="doStuff"></div>', [] );
 
 		assertThat( $result, is( equalTo( '<div></div>' ) ) );
 	}
 
-	/**
-	 * @test
-	 */
-	public function templateHasOnClickHandlerInSomeChildNode_RemoveHandlerFormOutput() {
+	public function testTemplateHasOnClickHandlerInSomeChildNode_RemoveHandlerFormOutput() {
 		$result = $this->createAndRender( '<p><a v-on:click="doStuff"></a></p>', [] );
 
 		assertThat( $result, is( equalTo( '<p><a></a></p>' ) ) );
 	}
 
-	/**
-	 * @test
-	 */
-	public function templateHasOnClickHandlerInGrandChildNode_RemoveHandlerFormOutput() {
+	public function testTemplateHasOnClickHandlerInGrandChildNode_RemoveHandlerFormOutput() {
 		$result = $this->createAndRender( '<p><b><a v-on:click="doStuff"></a></b></p>', [] );
 
 		assertThat( $result, is( equalTo( '<p><b><a></a></b></p>' ) ) );
 	}
 
-	/**
-	 * @test
-	 */
-	public function templateWithSingleMustacheVariable_ReplacesVariableWithGivenValue() {
+	public function testTemplateWithSingleMustacheVariable_ReplacesVariableWithGivenValue() {
 		$result = $this->createAndRender( '<p>{{value}}</p>', [ 'value' => 'some value' ] );
 
 		assertThat( $result, is( equalTo( '<p>some value</p>' ) ) );
 	}
 
-	/**
-	 * @test
-	 */
-	public function templateWithVariableAndDiacritcsInValue_ReplacesVariableWithEncodedValue() {
+	public function testTemplateWithVariableAndDiacritcsInValue_ReplacesVariableWithEncodedValue() {
 		$result = $this->createAndRender( '<p>{{value}}</p>', [ 'value' => 'inglés' ] );
 
 		assertThat( $result, is( equalTo( '<p>inglés</p>' ) ) );
 	}
 
-	/**
-	 * @test
-	 */
-	public function templateWithVariableAndValueInKorean_ReplacesVariableWithEncodedValue() {
+	public function testTemplateWithVariableAndValueInKorean_ReplacesVariableWithEncodedValue() {
 		$result = $this->createAndRender( '<p>{{value}}</p>', [ 'value' => '한국어' ] );
 
 		assertThat( $result, is( equalTo( '<p>한국어</p>' ) ) );
 	}
 
-	/**
-	 * @test
-	 */
-	public function templateWithVhtmlVariable_ReplacesVariableWithGivenValue() {
+	public function testTemplateWithVhtmlVariable_ReplacesVariableWithGivenValue() {
 		$result = $this->createAndRender(
 			'<div><div v-html="value"></div></div>',
 			[ 'value' => '<p>some value</p>' ]
@@ -100,10 +73,7 @@ class TemplatingTest extends TestCase {
 		assertThat( $result, is( equalTo( '<div><div><p>some value</p></div></div>' ) ) );
 	}
 
-	/**
-	 * @test
-	 */
-	public function templateWithVhtmlAndDiacritcsInValue_ReplacesVariableWithEncodedValue() {
+	public function testTemplateWithVhtmlAndDiacritcsInValue_ReplacesVariableWithEncodedValue() {
 		$result = $this->createAndRender(
 			'<div><div v-html="value"></div></div>',
 			[ 'value' => '<p>inglés</p>' ]
@@ -112,10 +82,7 @@ class TemplatingTest extends TestCase {
 		assertThat( $result, is( equalTo( '<div><div><p>inglés</p></div></div>' ) ) );
 	}
 
-	/**
-	 * @test
-	 */
-	public function templateWithVhtmlAndValueInKorean_ReplacesVariableWithEncodedValue() {
+	public function testTemplateWithVhtmlAndValueInKorean_ReplacesVariableWithEncodedValue() {
 		$result = $this->createAndRender(
 			'<div><div v-html="value"></div></div>',
 			[ 'value' => '<p>한국어</p>' ]
@@ -124,44 +91,29 @@ class TemplatingTest extends TestCase {
 		assertThat( $result, is( equalTo( '<div><div><p>한국어</p></div></div>' ) ) );
 	}
 
-	/**
-	 * @test
-	 */
-	public function templateWithMustacheVariable_VariableIsUndefined_ThrowsException() {
+	public function testTemplateWithMustacheVariable_VariableIsUndefined_ThrowsException() {
 		$this->setExpectedException( Exception::class );
 		$this->createAndRender( '<p>{{value}}</p>', [] );
 	}
 
-	/**
-	 * @test
-	 */
-	public function templateWithFilter_FilterIsUndefined_ThrowsException() {
+	public function testTemplateWithFilter_FilterIsUndefined_ThrowsException() {
 		$this->setExpectedException( Exception::class );
 		$this->createAndRender( '<p>{{value|nonexistentFilter}}</p>', [ 'value' => 'some value' ] );
 	}
 
-	/**
-	 * @test
-	 */
-	public function templateWithMustacheVariableSurroundedByText_ReplacesVariableWithGivenValue() {
+	public function testTemplateWithMustacheVariableSurroundedByText_ReplacesVariableWithGivenValue() {
 		$result = $this->createAndRender( '<p>before {{value}} after</p>', [ 'value' => 'some value' ] );
 
 		assertThat( $result, is( equalTo( '<p>before some value after</p>' ) ) );
 	}
 
-	/**
-	 * @test
-	 */
-	public function templateWithMustacheHavingStringLiteral_JustPrintString() {
+	public function testTemplateWithMustacheHavingStringLiteral_JustPrintString() {
 		$result = $this->createAndRender( "<p>before {{'string'}} after</p>", [] );
 
 		assertThat( $result, is( equalTo( '<p>before string after</p>' ) ) );
 	}
 
-	/**
-	 * @test
-	 */
-	public function templateWithMustacheFilter_ReplacesVariableWithGivenCallbackReturnValue() {
+	public function testTemplateWithMustacheFilter_ReplacesVariableWithGivenCallbackReturnValue() {
 		$result = $this->createAndRender(
 			"<p>{{'ABC'|message}}</p>",
 			[],
@@ -175,37 +127,25 @@ class TemplatingTest extends TestCase {
 		assertThat( $result, is( equalTo( '<p>some ABC message</p>' ) ) );
 	}
 
-	/**
-	 * @test
-	 */
-	public function templateWithTruthfulConditionInIf_IsNotRemoved() {
+	public function testTemplateWithTruthfulConditionInIf_IsNotRemoved() {
 		$result = $this->createAndRender( '<p><a v-if="variable"></a></p>', [ 'variable' => true ] );
 
 		assertThat( $result, is( equalTo( '<p><a></a></p>' ) ) );
 	}
 
-	/**
-	 * @test
-	 */
-	public function templateWithUntruthfulConditionInIf_IsRemoved() {
+	public function testTemplateWithUntruthfulConditionInIf_IsRemoved() {
 		$result = $this->createAndRender( '<p><a v-if="variable"></a></p>', [ 'variable' => false ] );
 
 		assertThat( $result, is( equalTo( '<p></p>' ) ) );
 	}
 
-	/**
-	 * @test
-	 */
-	public function templateWithNegatedFalseInIf_IsNotRemoved() {
+	public function testTemplateWithNegatedFalseInIf_IsNotRemoved() {
 		$result = $this->createAndRender( '<p><a v-if="!variable"></a></p>', [ 'variable' => false ] );
 
 		assertThat( $result, is( equalTo( '<p><a></a></p>' ) ) );
 	}
 
-	/**
-	 * @test
-	 */
-	public function templateWithIfElseBlockAndTruthfulCondition_ElseIsRemoved() {
+	public function testTemplateWithIfElseBlockAndTruthfulCondition_ElseIsRemoved() {
 		$result = $this->createAndRender(
 			'<p><a v-if="variable">if</a><a v-else>else</a></p>',
 			[ 'variable' => true ]
@@ -214,10 +154,7 @@ class TemplatingTest extends TestCase {
 		assertThat( $result, is( equalTo( '<p><a>if</a></p>' ) ) );
 	}
 
-	/**
-	 * @test
-	 */
-	public function templateWithIfElseBlockAndNontruthfulCondition_ElseIsDisplayed() {
+	public function testTemplateWithIfElseBlockAndNontruthfulCondition_ElseIsDisplayed() {
 		$result = $this->createAndRender(
 			'<p><a v-if="variable">if</a><a v-else>else</a></p>',
 			[ 'variable' => false ]
@@ -226,19 +163,13 @@ class TemplatingTest extends TestCase {
 		assertThat( $result, is( equalTo( '<p><a>else</a></p>' ) ) );
 	}
 
-	/**
-	 * @test
-	 */
-	public function templateWithForLoopAndEmptyArrayToIterate_NotRendered() {
+	public function testTemplateWithForLoopAndEmptyArrayToIterate_NotRendered() {
 		$result = $this->createAndRender( '<p><a v-for="item in list"></a></p>', [ 'list' => [] ] );
 
 		assertThat( $result, is( equalTo( '<p></p>' ) ) );
 	}
 
-	/**
-	 * @test
-	 */
-	public function templateWithForLoopAndSingleElementInArrayToIterate_RenderedOnce() {
+	public function testTemplateWithForLoopAndSingleElementInArrayToIterate_RenderedOnce() {
 		$result = $this->createAndRender(
 			'<p><a v-for="item in list"></a></p>',
 			[ 'list' => [ 1 ] ]
@@ -247,10 +178,7 @@ class TemplatingTest extends TestCase {
 		assertThat( $result, is( equalTo( '<p><a></a></p>' ) ) );
 	}
 
-	/**
-	 * @test
-	 */
-	public function templateWithForLoopAndMultipleElementsInArrayToIterate_RenderedMultipleTimes() {
+	public function testTemplateWithForLoopAndMultipleElementsInArrayToIterate_RenderedMultipleTimes() {
 		$result = $this->createAndRender(
 			'<p><a v-for="item in list"></a></p>',
 			[ 'list' => [ 1, 2 ] ]
@@ -259,10 +187,7 @@ class TemplatingTest extends TestCase {
 		assertThat( $result, is( equalTo( '<p><a></a><a></a></p>' ) ) );
 	}
 
-	/**
-	 * @test
-	 */
-	public function templateWithForLoopMustache_RendersCorrectValues() {
+	public function testTemplateWithForLoopMustache_RendersCorrectValues() {
 		$result = $this->createAndRender(
 			'<p><a v-for="item in list">{{item}}</a></p>',
 			[ 'list' => [ 1, 2 ] ]
@@ -271,19 +196,13 @@ class TemplatingTest extends TestCase {
 		assertThat( $result, is( equalTo( '<p><a>1</a><a>2</a></p>' ) ) );
 	}
 
-	/**
-	 * @test
-	 */
-	public function templateWithAttributeBinding_ConditionIsFalse_AttributeIsNotRendered() {
+	public function testTemplateWithAttributeBinding_ConditionIsFalse_AttributeIsNotRendered() {
 		$result = $this->createAndRender( '<p :attr1="condition"></p>', [ 'condition' => false ] );
 
 		assertThat( $result, is( equalTo( '<p></p>' ) ) );
 	}
 
-	/**
-	 * @test
-	 */
-	public function templateWithAttributeBinding_ConditionIsTrue_AttributeIsRendered() {
+	public function testTemplateWithAttributeBinding_ConditionIsTrue_AttributeIsRendered() {
 		$result = $this->createAndRender(
 			'<p :disabled="condition"></p>',
 			[ 'condition' => true ]
@@ -292,10 +211,8 @@ class TemplatingTest extends TestCase {
 		assertThat( $result, is( equalTo( '<p disabled></p>' ) ) );
 	}
 
-	/**
-	 * @test
-	 */
-	public function templateWithAttributeBinding_ConditionIsString_AttributeIsRenderedWithThatString() {
+	// phpcs:ignore Generic.Files.LineLength.TooLong
+	public function testTemplateWithAttributeBinding_ConditionIsString_AttributeIsRenderedWithThatString() {
 		//TODO Rename variable name
 		$result = $this->createAndRender(
 			'<p :attr1="condition"></p>',
@@ -305,10 +222,7 @@ class TemplatingTest extends TestCase {
 		assertThat( $result, is( equalTo( '<p attr1="some string"></p>' ) ) );
 	}
 
-	/**
-	 * @test
-	 */
-	public function templateWithPropertyAccessInMustache_CorrectValueIsRendered() {
+	public function testTemplateWithPropertyAccessInMustache_CorrectValueIsRendered() {
 		$result = $this->createAndRender(
 			'<p>{{var.property}}</p>',
 			[ 'var' => [ 'property' => 'value' ] ]
@@ -317,10 +231,7 @@ class TemplatingTest extends TestCase {
 		assertThat( $result, is( equalTo( '<p>value</p>' ) ) );
 	}
 
-	/**
-	 * @test
-	 */
-	public function templateWithFilterAccessInAttributeBinding_CorrectValueIsRendered() {
+	public function testTemplateWithFilterAccessInAttributeBinding_CorrectValueIsRendered() {
 		$result = $this->createAndRender(
 			'<p :attr1="var.property|strtoupper"></p>',
 			[ 'var' => [ 'property' => 'value' ] ],
@@ -330,10 +241,8 @@ class TemplatingTest extends TestCase {
 		assertThat( $result, is( equalTo( '<p attr1="VALUE"></p>' ) ) );
 	}
 
-	/**
-	 * @test
-	 */
-	public function templateWithFilterAccessInAttributeBindingInsideTheLoop_CorrectValueIsRendered() {
+	// phpcs:ignore Generic.Files.LineLength.TooLong
+	public function testTemplateWithFilterAccessInAttributeBindingInsideTheLoop_CorrectValueIsRendered() {
 		$result = $this->createAndRender(
 			'<p><a v-for="item in items" :attr1="item.property|strtoupper"></a></p>',
 			[ 'items' => [

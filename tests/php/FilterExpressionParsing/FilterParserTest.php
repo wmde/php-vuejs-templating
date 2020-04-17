@@ -7,13 +7,15 @@ use WMDE\VueJsTemplating\FilterExpressionParsing\FilterCall;
 use WMDE\VueJsTemplating\FilterExpressionParsing\FilterParser;
 use WMDE\VueJsTemplating\FilterExpressionParsing\ParseResult;
 
+/**
+ * @covers \WMDE\VueJsTemplating\FilterExpressionParsing\FilterParser
+ */
 class FilterParserTest extends TestCase {
 
 	/**
-	 * @test
 	 * @dataProvider provideParseCases
 	 */
-	public function parseTest( $expression, $expectedResult ) {
+	public function testParse( $expression, $expectedResult ) {
 		$filterParser = new FilterParser();
 
 		$result = $filterParser->parse( $expression );
