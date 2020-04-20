@@ -4,7 +4,7 @@ namespace WMDE\VueJsTemplating\FilterExpressionParsing;
 
 class FilterParser {
 
-	const VALID_DIVISION_CHAR_REGEX = '/[\w).+\-_$\]]/';
+	private const VALID_DIVISION_CHAR_REGEX = '/[\w).+\-_$\]]/';
 
 	private $filters = [];
 

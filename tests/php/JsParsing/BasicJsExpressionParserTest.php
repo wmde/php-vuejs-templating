@@ -5,12 +5,12 @@ namespace WMDE\VueJsTemplating\Test\JsParsing;
 use PHPUnit\Framework\TestCase;
 use WMDE\VueJsTemplating\JsParsing\BasicJsExpressionParser;
 
+/**
+ * @covers \WMDE\VueJsTemplating\JsParsing\BasicJsExpressionParser
+ */
 class BasicJsExpressionParserTest extends TestCase {
 
-	/**
-	 * @test
-	 */
-	public function canParseString() {
+	public function testCanParseString() {
 		$jsExpressionEvaluator = new BasicJsExpressionParser();
 
 		$parsedExpression = $jsExpressionEvaluator->parse( "'some string'" );
@@ -19,10 +19,7 @@ class BasicJsExpressionParserTest extends TestCase {
 		$this->assertEquals( 'some string', $result );
 	}
 
-	/**
-	 * @test
-	 */
-	public function canParsePropertyAccess() {
+	public function testCanParsePropertyAccess() {
 		$jsExpressionEvaluator = new BasicJsExpressionParser();
 
 		$parsedExpression = $jsExpressionEvaluator->parse( "variable.property" );
@@ -31,22 +28,16 @@ class BasicJsExpressionParserTest extends TestCase {
 		$this->assertEquals( 'some value', $result );
 	}
 
-	/**
-	 * @test
-	 */
-	public function canParseNegationOperator() {
+	public function testCanParseNegationOperator() {
 		$jsExpressionEvaluator = new BasicJsExpressionParser();
 
 		$negation = $jsExpressionEvaluator->parse( "!variable" );
 
-		$this->assertEquals( true, $negation->evaluate( [ 'variable' => false ] ) );
-		$this->assertEquals( false, $negation->evaluate( [ 'variable' => true ] ) );
+		$this->assertTrue( $negation->evaluate( [ 'variable' => false ] ) );
+		$this->assertFalse( $negation->evaluate( [ 'variable' => true ] ) );
 	}
 
-	/**
-	 * @test
-	 */
-	public function ignoresTrailingAndLeadingSpaces() {
+	public function testIgnoresTrailingAndLeadingSpaces() {
 		$jsExpressionEvaluator = new BasicJsExpressionParser();
 
 		$parsedExpression = $jsExpressionEvaluator->parse( " 'some string' " );
