@@ -17,19 +17,14 @@
 		}
 	},
 	"require-dev": {
-		"phpunit/phpunit": "^4.8.35",
-		"wikibase/wikibase-codesniffer": "^1.1.0",
-		"wmde/hamcrest-html-matchers": "^0.1.0"
+		"phpunit/phpunit": "^8.5.3",
+		"wikibase/wikibase-codesniffer": "^1.1.0"
 	},
 	"autoload-dev": {
 		"psr-4": {
 			"WMDE\\VueJsTemplating\\IntegrationTest\\": "tests/integration",
 			"WMDE\\VueJsTemplating\\Test\\": "tests/php"
-		},
-		"files": [
-			"vendor/hamcrest/hamcrest-php/hamcrest/Hamcrest.php",
-			"vendor/wmde/hamcrest-html-matchers/src/functions.php"
-		]
+		}
 	},
 	"scripts": {
 		"test": [

@@ -16,13 +16,15 @@ class CachingExpressionParserTest extends TestCase {
 	public function testParse_CallsInternalParserAndReturnsItsResult() {
 		$expectedExpression = new StringLiteral( 'some string' );
 
-		$internalParser = $this->prophesize( JsExpressionParser::class );
-		$internalParser->parse( "'some string'" )->willReturn( $expectedExpression );
-		$cachingExpressionParser = new CachingExpressionParser( $internalParser->reveal() );
+		$internalParser = $this->createMock( JsExpressionParser::class );
+		$internalParser->expects( $this->once() )
+			->method( 'parse' )
+			->with( "'some string'" )
+			->willReturn( $expectedExpression );
+		$cachingExpressionParser = new CachingExpressionParser( $internalParser );
 
 		$result = $cachingExpressionParser->parse( "'some string'" );
 
-		$internalParser->parse( "'some string'" )->shouldHaveBeenCalled();
 		$this->assertSame( $expectedExpression, $result );
 	}
 
