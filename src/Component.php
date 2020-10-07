@@ -72,7 +72,9 @@ class Component {
 		$document = new DOMDocument( '1.0', 'UTF-8' );
 
 		// Ensure $html is treated as UTF-8, see https://stackoverflow.com/a/8218649
-		if ( !$document->loadHTML( '<?xml encoding="utf-8" ?>' . $html ) ) {
+		// LIBXML_NOBLANKS Constant excludes "ghost nodes" to avoid violating
+		// vue's single root node constraint
+		if ( !$document->loadHTML( '<?xml encoding="utf-8" ?>' . $html, LIBXML_NOBLANKS ) ) {
 			//TODO Test failure
 		}
 
