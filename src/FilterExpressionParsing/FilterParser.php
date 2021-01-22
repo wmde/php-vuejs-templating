@@ -20,6 +20,7 @@ class FilterParser {
 	 *
 	 * @return ParseResult
 	 */
+	// phpcs:ignore Generic.Metrics.CyclomaticComplexity
 	public function parse( $exp ) {
 		$inSingle = false;
 		$inDouble = false;
