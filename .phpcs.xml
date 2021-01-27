@@ -1,8 +1,31 @@
 <?xml version="1.0"?>
 <ruleset>
-	<rule ref="./vendor/wikibase/wikibase-codesniffer/Wikibase">
-		<exclude name="Wikibase.Commenting.ClassLevelDocumentation" />
+
+	<!-- This rule set includes all rules from the MediaWiki rule set, see
+		https://github.com/wikimedia/mediawiki-tools-codesniffer/blob/master/MediaWiki/ruleset.xml
+		-->
+	<rule ref="./vendor/mediawiki/mediawiki-codesniffer/MediaWiki">
+
+		<!-- The function comment sniff is way to rigorous about way to many details that need
+			exceptions:
+			* It complains about missing documentation on fully self-explanatory function headers
+			  with strict type hints.
+			* It complains about missing documentation if there is a proper @see tag.
+			* It complains about duplicate spaces in "@param <type>  $<var>", but removing these
+			  doesn't make the code easier to read.
+			* It does not understand "@param <type> [$optional,…]. -->
+		<exclude name="MediaWiki.Commenting.FunctionComment" />
+
+		<exclude name="MediaWiki.Commenting.PropertyDocumentation.MissingDocumentationPrivate" />
+
+		<!-- Even if we encourage to use spaces in comments, we don't think this sniff should block
+			patches from being merged. -->
+		<exclude name="MediaWiki.WhiteSpace.SpaceBeforeSingleLineComment" />
 	</rule>
+
+	<!-- Metrics are intentionally not part of the base Wikibase CodeSniffer rule set. -->
+	<rule ref="Generic.Metrics.CyclomaticComplexity" />
+	<rule ref="Generic.Metrics.NestingLevel" />
 
 	<rule ref="Generic.Files.LineLength">
 		<properties>
@@ -11,4 +34,6 @@
 	</rule>
 
 	<file>.</file>
+	<arg name="extensions" value="php" />
+	<arg name="encoding" value="UTF-8" />
 </ruleset>
