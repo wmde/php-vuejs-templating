@@ -3,14 +3,14 @@
         <div class="wikibase-lexeme-sense-glosses-list">
             <table class="wikibase-lexeme-sense-glosses-table">
                 <tbody>
-                <tr v-for="gloss in glosses" class="wikibase-lexeme-sense-gloss">
+                <tr v-for="(gloss, index) in glosses" class="wikibase-lexeme-sense-gloss">
                     <td class="wikibase-lexeme-sense-gloss-language">
                         <span v-if="!inEditMode">{{gloss.language}}</span>
-                        <input v-else="" class="wikibase-lexeme-sense-gloss-language-input" v-model="gloss.language" :disabled="isSaving">
+                        <input v-else class="wikibase-lexeme-sense-gloss-language-input" v-model="gloss.language" :disabled="isSaving">
                     </td>
                     <td class="wikibase-lexeme-sense-gloss-value">
                         <span v-if="!inEditMode" :dir="gloss.language|directionality" :lang="gloss.language">{{gloss.value}} <span class="wikibase-lexeme-sense-glosses-sense-id">({{senseId}})</span></span>
-                        <input v-else="" class="wikibase-lexeme-sense-gloss-value-input" v-model="gloss.value" :disabled="isSaving">
+                        <input v-else class="wikibase-lexeme-sense-gloss-value-input" v-model="gloss.value" :disabled="isSaving" :autofocus="index == glosses.length - 1">
                     </td>
                 </tr>
                 </tbody>
