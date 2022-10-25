@@ -22,6 +22,15 @@ class FilterParser {
 	 */
 	// phpcs:ignore Generic.Metrics.CyclomaticComplexity
 	public function parse( $exp ) {
+		/**
+		 * matching `directionality(gloss.language)` and `message('wikibase-edit')`
+		 */
+		if (preg_match('/^(\w+?)\(([\w.\-\']+?)\)$/', $exp, $matches)) {
+			$this->expressions = [ $matches[2] ];
+			$this->filters[] = new FilterCall($matches[1], []);
+			return new ParseResult($this->expressions, $this->filters);
+		}
+
 		$inSingle = false;
 		$inDouble = false;
 		$inTemplateString = false;

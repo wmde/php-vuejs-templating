@@ -13,20 +13,20 @@
                     <li v-for="lemma in lemmas" class="lemma-widget_lemma-edit-box">
                         <input size="1" class="lemma-widget_lemma-value-input" v-model="lemma.value" :disabled="isSaving">
                         <input size="1" class="lemma-widget_lemma-language-input" v-model="lemma.language" :disabled="isSaving">
-                        <button class="lemma-widget_lemma-remove" v-on:click="remove(lemma)" :disabled="isSaving" :title="'wikibase-remove'|message">
+                        <button class="lemma-widget_lemma-remove" v-on:click="remove(lemma)" :disabled="isSaving" :title="message('wikibase-remove')">
                             ×
                         </button>
                     </li>
                     <li>
-                        <button type="button" class="lemma-widget_add" v-on:click="add" :disabled="isSaving" :title="'wikibase-add'|message">+</button>
+                        <button type="button" class="lemma-widget_add" v-on:click="add" :disabled="isSaving" :title="message('wikibase-add')">+</button>
                     </li>
                 </ul>
             </div>
         </div>
         <div class="lemma-widget_controls">
-            <button type="button" class="lemma-widget_control" v-if="!inEditMode" :disabled="isSaving" v-on:click="edit">{{'wikibase-edit'|message}}</button>
-            <button type="button" class="lemma-widget_control" v-if="inEditMode" :disabled="isSaving" v-on:click="save">{{'wikibase-save'|message}}</button>
-            <button type="button" class="lemma-widget_control" v-if="inEditMode" :disabled="isSaving" v-on:click="cancel">{{'wikibase-cancel'|message}}</button>
+            <button type="button" class="lemma-widget_control" v-if="!inEditMode" :disabled="isSaving" v-on:click="edit">{{message('wikibase-edit')}}</button>
+            <button type="button" class="lemma-widget_control" v-if="inEditMode" :disabled="isSaving" v-on:click="save">{{message('wikibase-save')}}</button>
+            <button type="button" class="lemma-widget_control" v-if="inEditMode" :disabled="isSaving" v-on:click="cancel">{{message('wikibase-cancel')}}</button>
         </div>
     </div>
 </template>
