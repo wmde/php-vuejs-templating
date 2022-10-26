@@ -26,9 +26,7 @@ class FilterParser {
 		 * matching `directionality(gloss.language)` and `message('wikibase-edit')`
 		 */
 		if ( preg_match( '/^(\w+?)\(([\w.\-\']+?)\)$/', $exp, $matches ) ) {
-			$this->expressions = [ $matches[2] ];
-			$this->filters[] = new FilterCall( $matches[1], [] );
-			return new ParseResult( $this->expressions, $this->filters );
+			return new ParseResult( [ $matches[2] ], [ new FilterCall( $matches[1], [] ) ] );
 		}
 
 		$inSingle = false;
