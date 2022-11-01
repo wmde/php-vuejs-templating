@@ -73,6 +73,10 @@ class FilterParserTest extends TestCase {
 				'filter(var1)',
 				new ParseResult( [ 'var1' ], [ new FilterCall( 'filter', [] ) ] )
 			],
+			'method call with single argument and a bit of spacing' => [
+				' filter( var1 ) ',
+				new ParseResult( [ 'var1' ], [ new FilterCall( 'filter', [] ) ] )
+			],
 			'variable with filter having no arguments' => [
 				'var1|filter',
 				new ParseResult( [ 'var1' ], [ new FilterCall( 'filter', [] ) ] )
