@@ -9,7 +9,7 @@
                         <input v-else="" class="wikibase-lexeme-sense-gloss-language-input" v-model="gloss.language" :disabled="isSaving">
                     </td>
                     <td class="wikibase-lexeme-sense-gloss-value">
-                        <span v-if="!inEditMode" :dir="directionality(gloss.language)" :lang="gloss.language">{{gloss.value}} <span class="wikibase-lexeme-sense-glosses-sense-id">({{senseId}})</span></span>
+                        <span v-if="!inEditMode" :dir="gloss.language|directionality" :lang="gloss.language">{{gloss.value}} <span class="wikibase-lexeme-sense-glosses-sense-id">({{senseId}})</span></span>
                         <input v-else="" class="wikibase-lexeme-sense-gloss-value-input" v-model="gloss.value" :disabled="isSaving">
                     </td>
                 </tr>
@@ -19,16 +19,16 @@
                     <td>
                     </td>
                     <td>
-                        <button type="button" class="wikibase-lexeme-sense-glosses-control" v-on:click="add" :disabled="isSaving">+ {{message('wikibase-add')}}</button>
+                        <button type="button" class="wikibase-lexeme-sense-glosses-control" v-on:click="add" :disabled="isSaving">+ {{'wikibase-add'|message}}</button>
                     </td>
                 </tr>
                 </tfoot>
             </table>
         </div>
         <div class="wikibase-lexeme-sense-glosses-controls">
-            <button type="button" class="wikibase-lexeme-sense-glosses-control" v-if="!inEditMode" v-on:click="edit" :disabled="isSaving">{{message('wikibase-edit')}}</button>
-            <button type="button" class="wikibase-lexeme-sense-glosses-control" v-if="inEditMode" v-on:click="save" :disabled="isSaving">{{message('wikibase-save')}}</button>
-            <button type="button" class="wikibase-lexeme-sense-glosses-control" v-if="inEditMode" v-on:click="cancel" :disabled="isSaving">{{message('wikibase-cancel')}}</button>
+            <button type="button" class="wikibase-lexeme-sense-glosses-control" v-if="!inEditMode" v-on:click="edit" :disabled="isSaving">{{'wikibase-edit'|message}}</button>
+            <button type="button" class="wikibase-lexeme-sense-glosses-control" v-if="inEditMode" v-on:click="save" :disabled="isSaving">{{'wikibase-save'|message}}</button>
+            <button type="button" class="wikibase-lexeme-sense-glosses-control" v-if="inEditMode" v-on:click="cancel" :disabled="isSaving">{{'wikibase-cancel'|message}}</button>
         </div>
     </div>
 </template>
