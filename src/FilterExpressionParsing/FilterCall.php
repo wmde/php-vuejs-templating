@@ -2,6 +2,9 @@
 
 namespace WMDE\VueJsTemplating\FilterExpressionParsing;
 
+/**
+ * This represents both calls to a filter and calls to a method.
+ */
 class FilterCall {
 
 	/**
