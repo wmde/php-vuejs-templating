@@ -1,6 +1,6 @@
-var Vue = require( 'vue' );
+const { createSSRApp } = require( 'vue' );
 const cheerio = require( 'cheerio' );
-const renderer = require( 'vue-server-renderer' ).createRenderer();
+const { renderToString } = require( 'vue/server-renderer' );
 const fs = require( 'fs' );
 
 const fixtureDir = __dirname + '/fixture';
@@ -37,21 +37,13 @@ function extractDataFromFixture( html ) {
 }
 
 function renderTemplate( fixtureData ) {
-	return new Promise( function ( resolve, reject ) {
-		const app = new Vue( {
-			template: fixtureData.template,
-			data: fixtureData.data,
-			methods: defaultMethods
-		} );
-
-		renderer.renderToString( app, function ( err, html ) {
-			if ( err ) {
-				reject( err )
-			} else {
-				resolve( html );
-			}
-		} );
+	const app = createSSRApp( {
+		template: fixtureData.template,
+		data: () => fixtureData.data,
+		methods: defaultMethods
 	} );
+
+	return renderToString( app );
 }
 
 function removeServerRenderedDataAttribute( html ) {
