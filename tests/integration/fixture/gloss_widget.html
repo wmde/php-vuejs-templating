@@ -6,11 +6,11 @@
                 <tr v-for="gloss in glosses" class="wikibase-lexeme-sense-gloss">
                     <td class="wikibase-lexeme-sense-gloss-language">
                         <span v-if="!inEditMode">{{gloss.language}}</span>
-                        <input v-else="" class="wikibase-lexeme-sense-gloss-language-input" v-model="gloss.language" :disabled="isSaving">
+                        <input v-else class="wikibase-lexeme-sense-gloss-language-input" v-model="gloss.language" :disabled="isSaving">
                     </td>
                     <td class="wikibase-lexeme-sense-gloss-value">
                         <span v-if="!inEditMode" :dir="directionality(gloss.language)" :lang="gloss.language">{{gloss.value}} <span class="wikibase-lexeme-sense-glosses-sense-id">({{senseId}})</span></span>
-                        <input v-else="" class="wikibase-lexeme-sense-gloss-value-input" v-model="gloss.value" :disabled="isSaving">
+                        <input v-else class="wikibase-lexeme-sense-gloss-value-input" v-model="gloss.value" :disabled="isSaving">
                     </td>
                 </tr>
                 </tbody>
