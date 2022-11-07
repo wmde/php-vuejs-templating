@@ -1,10 +1,8 @@
 {
 	"name": "php-vuejs-templating",
-	"dependencies": {},
 	"devDependencies": {
-		"vue": "^2.3.4",
-		"vue-server-renderer": "^2.3.4",
-		"cheerio": "^0.22.0"
+		"cheerio": "^0.22.0",
+		"vue": "^3.2.41"
 	},
 	"scripts": {
 		"populate-fixtures": "node tests/integration/populate_fixtures_with_expected_results.js"

@@ -29,7 +29,7 @@ class CachingExpressionParserTest extends TestCase {
 	}
 
 	public function testParse_SameExpression_GetExactlySameObject() {
-		$cachingExpressionParser = new CachingExpressionParser( new BasicJsExpressionParser() );
+		$cachingExpressionParser = new CachingExpressionParser( new BasicJsExpressionParser( [] ) );
 
 		$expression1 = $cachingExpressionParser->parse( "'some string'" );
 		$expression2 = $cachingExpressionParser->parse( "'some string'" );
@@ -38,7 +38,7 @@ class CachingExpressionParserTest extends TestCase {
 	}
 
 	public function testParse_IgnoresSurroundingSpaces_GetExactlySameObject() {
-		$cachingExpressionParser = new CachingExpressionParser( new BasicJsExpressionParser() );
+		$cachingExpressionParser = new CachingExpressionParser( new BasicJsExpressionParser( [] ) );
 
 		$expression1 = $cachingExpressionParser->parse( "'some string'" );
 		$expression2 = $cachingExpressionParser->parse( " 'some string' " );

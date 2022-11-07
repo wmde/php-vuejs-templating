@@ -19,14 +19,14 @@ class FixtureTest extends TestCase {
 	 */
 	public function testPhpRenderingEqualsVueJsRendering( $template, array $data, $expectedResult ) {
 		$templating = new Templating();
-		$filters = [
+		$methods = [
 			'message' => 'strval',
 			'directionality' => function () {
 				return 'auto';
 			}
 		];
 
-		$result = $templating->render( $template, $data, $filters );
+		$result = $templating->render( $template, $data, $methods );
 
 		$this->assertEqualHtml( $expectedResult, $result );
 	}

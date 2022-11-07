@@ -96,9 +96,9 @@ class TemplatingTest extends TestCase {
 		$this->createAndRender( '<p>{{value}}</p>', [] );
 	}
 
-	public function testTemplateWithFilter_FilterIsUndefined_ThrowsException() {
+	public function testTemplateWithMethod_MethodIsUndefined_ThrowsException() {
 		$this->expectException( Exception::class );
-		$this->createAndRender( '<p>{{value|nonexistentFilter}}</p>', [ 'value' => 'some value' ] );
+		$this->createAndRender( '<p>{{nonexistentMethod(value)}}</p>', [ 'value' => 'some value' ] );
 	}
 
 	public function testTemplateWithMustacheVariableSurroundedByText_ReplacesVariableWithGivenValue() {
@@ -113,9 +113,9 @@ class TemplatingTest extends TestCase {
 		$this->assertSame( '<p>before string after</p>', $result );
 	}
 
-	public function testTemplateWithMustacheFilter_ReplacesVariableWithGivenCallbackReturnValue() {
+	public function testTemplateWithMustacheMethod_ReplacesVariableWithGivenCallbackReturnValue() {
 		$result = $this->createAndRender(
-			"<p>{{'ABC'|message}}</p>",
+			"<p>{{message('ABC')}}</p>",
 			[],
 			[
 				'message' => function ( $value ) {
@@ -231,9 +231,9 @@ class TemplatingTest extends TestCase {
 		$this->assertSame( '<p>value</p>', $result );
 	}
 
-	public function testTemplateWithFilterAccessInAttributeBinding_CorrectValueIsRendered() {
+	public function testTemplateWithMethodAccessInAttributeBinding_CorrectValueIsRendered() {
 		$result = $this->createAndRender(
-			'<p :attr1="var.property|strtoupper"></p>',
+			'<p :attr1="strtoupper(var.property)"></p>',
 			[ 'var' => [ 'property' => 'value' ] ],
 			[ 'strtoupper' => 'strtoupper' ]
 		);
@@ -242,9 +242,9 @@ class TemplatingTest extends TestCase {
 	}
 
 	// phpcs:ignore Generic.Files.LineLength.TooLong
-	public function testTemplateWithFilterAccessInAttributeBindingInsideTheLoop_CorrectValueIsRendered() {
+	public function testTemplateWithMethodAccessInAttributeBindingInsideTheLoop_CorrectValueIsRendered() {
 		$result = $this->createAndRender(
-			'<p><a v-for="item in items" :attr1="item.property|strtoupper"></a></p>',
+			'<p><a v-for="item in items" :attr1="strtoupper(item.property)"></a></p>',
 			[ 'items' => [
 				[ 'property' => 'value1' ],
 				[ 'property' => 'value2' ],
@@ -258,13 +258,13 @@ class TemplatingTest extends TestCase {
 	/**
 	 * @param string $template HTML
 	 * @param array $data
-	 * @param callable[] $filters
+	 * @param callable[] $methods
 	 *
 	 * @return string
 	 */
-	private function createAndRender( $template, array $data, array $filters = [] ) {
+	private function createAndRender( $template, array $data, array $methods = [] ) {
 		$templating = new Templating();
-		return $templating->render( $template, $data, $filters );
+		return $templating->render( $template, $data, $methods );
 	}
 
 	/**

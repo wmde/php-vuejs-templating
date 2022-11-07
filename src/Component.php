@@ -12,24 +12,16 @@ use DOMText;
 use Exception;
 use LibXMLError;
 
-use WMDE\VueJsTemplating\FilterExpressionParsing\FilterParser;
 use WMDE\VueJsTemplating\JsParsing\BasicJsExpressionParser;
 use WMDE\VueJsTemplating\JsParsing\CachingExpressionParser;
 use WMDE\VueJsTemplating\JsParsing\JsExpressionParser;
 
 class Component {
 
-	private $filterParser;
-
 	/**
 	 * @var string HTML
 	 */
 	private $template;
-
-	/**
-	 * @var callable[]
-	 */
-	private $filters = [];
 
 	/**
 	 * @var JsExpressionParser
@@ -38,13 +30,11 @@ class Component {
 
 	/**
 	 * @param string $template HTML
-	 * @param callable[] $filters
+	 * @param callable[] $methods
 	 */
-	public function __construct( $template, array $filters ) {
+	public function __construct( $template, array $methods ) {
 		$this->template = $template;
-		$this->filters = $filters;
-		$this->expressionParser = new CachingExpressionParser( new BasicJsExpressionParser() );
-		$this->filterParser = new FilterParser();
+		$this->expressionParser = new CachingExpressionParser( new BasicJsExpressionParser( $methods ) );
 	}
 
 	/**
@@ -161,8 +151,7 @@ class Component {
 			preg_match_all( $regex, $text, $matches );
 
 			foreach ( $matches['expression'] as $index => $expression ) {
-				$value = $this->filterParser->parse( $expression )
-					->toExpression( $this->expressionParser, $this->filters )
+				$value = $this->expressionParser->parse( $expression )
 					->evaluate( $data );
 
 				$text = str_replace( $matches[0][$index], $value, $text );
@@ -182,8 +171,7 @@ class Component {
 				continue;
 			}
 
-			$value = $this->filterParser->parse( $attribute->value )
-				->toExpression( $this->expressionParser, $this->filters )
+			$value = $this->expressionParser->parse( $attribute->value )
 				->evaluate( $data );
 
 			$name = substr( $attribute->name, 1 );
