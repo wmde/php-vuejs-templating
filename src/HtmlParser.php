@@ -53,6 +53,10 @@ class HtmlParser {
 	 * Get the root node of the template represented by the given document.
 	 */
 	public function getRootNode( DOMDocument $document ): DOMElement {
+		if ( $document->documentElement === null ) {
+			throw new Exception( 'Empty document' );
+		}
+
 		$rootNodes = $document->documentElement->childNodes->item( 0 )->childNodes;
 
 		if ( $rootNodes->length > 1 ) {
