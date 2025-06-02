@@ -53,13 +53,11 @@ class HtmlParser {
 	 * Get the root node of the template represented by the given document.
 	 */
 	public function getRootNode( DOMDocument $document ): DOMElement {
-		$rootNodes = $this->getBodyElement( $document )->childNodes;
-
-		if ( $rootNodes->length > 1 ) {
-			throw new Exception( 'Template should have only one root node' );
-		}
-
-		return $rootNodes[0];
+		$htmlElement = $this->getHtmlElement( $document );
+		$headOrBody = $this->getSoleHeadOrBody( $htmlElement );
+		$rootNodeParent = $this->getTemplateElement( $headOrBody ) ?? $headOrBody;
+		$rootNode = $this->getOnlySubstantialChild( $rootNodeParent );
+		return $rootNode;
 	}
 
 	/**
@@ -86,6 +84,92 @@ class HtmlParser {
 			throw new Exception( "Expected <body>, got <{$bodyElement->tagName}>" );
 		}
 		return $bodyElement;
+	}
+
+	/**
+	 * Get the `<head>` or `<body>` element of the given document,
+	 * asserting that it is the only child (cannot have both nor any other children).
+	 */
+	private function getSoleHeadOrBody( DOMElement $htmlElement ): DOMElement {
+		$length = $htmlElement->childNodes->length;
+		if ( $length !== 1 ) {
+			throw new Exception( "Expected exactly 1 <html> child, got $length" );
+		}
+
+		$child = $htmlElement->childNodes[0];
+		$tagName = $child->tagName;
+		if ( $tagName !== 'head' && $tagName !== 'body' ) {
+			throw new Exception( "Expected <head> or <body>, got <$tagName>" );
+		}
+
+		return $child;
+	}
+
+	/**
+	 * Get the `<template>` element of the given `<head>` or `<body>` element,
+	 * discarding any adjacent `<script>` or `<style>` elements
+	 * if the input is in Single-File Component (SFC) syntax.
+	 */
+	private function getTemplateElement( DOMElement $rootElement ): ?DOMElement {
+		$onlyTemplateElement = null;
+		foreach ( $rootElement->childNodes as $node ) {
+			if ( $node->nodeType === XML_COMMENT_NODE ) {
+				// comment node, ignore
+				continue;
+			} elseif ( $node->nodeType === XML_TEXT_NODE ) {
+				if ( trim( $node->textContent ) === '' ) {
+					// whitespace-only text node, ignore
+					continue;
+				} else {
+					// not SFC
+					$onlyTemplateElement = null;
+					break;
+				}
+			}
+			if ( $node->tagName === 'template' ) {
+				if ( $onlyTemplateElement === null ) {
+					$onlyTemplateElement = $node;
+				} else {
+					// more than one <template>, handle as non-SFC and throw error below
+					$onlyTemplateElement = null;
+					break;
+				}
+			} elseif ( $node->tagName !== 'script' && $node->tagName !== 'style' ) {
+				// top-level tag other than <template>, <script> or <style> => not SFC
+				$onlyTemplateElement = null;
+				break;
+			}
+		}
+		return $onlyTemplateElement;
+	}
+
+	/**
+	 * Get the only “substantial” child of the given element.
+	 * Ignore any adjacent comments or whitespace-only text nodes
+	 * (such as line breaks or indentation).
+	 */
+	private function getOnlySubstantialChild( DOMElement $element ): DOMElement {
+		$onlySubstantialChild = null;
+		foreach ( $element->childNodes as $node ) {
+			if ( $node->nodeType === XML_COMMENT_NODE ) {
+				// comment node, ignore
+				continue;
+			} elseif ( $node->nodeType === XML_TEXT_NODE && trim( $node->textContent ) === '' ) {
+				// whitespace-only text node, ignore
+				continue;
+			}
+			if ( $onlySubstantialChild === null ) {
+				$onlySubstantialChild = $node;
+			} else {
+				throw new Exception( 'Template should only have one root node' );
+			}
+		}
+
+		if ( $onlySubstantialChild !== null ) {
+			return $onlySubstantialChild;
+		} else {
+			throw new Exception( 'Template contained no root node' );
+		}
 	}
 
 }

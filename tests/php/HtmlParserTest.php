@@ -28,6 +28,23 @@ class HtmlParserTest extends TestCase {
 		$this->assertIsDivTest( $rootNode );
 	}
 
+	public function testSingleFileComponent_OnlyTemplate(): void {
+		$rootNode = $this->parseAndGetRootNode( '<template><div class="test"></div></template>' );
+		$this->assertIsDivTest( $rootNode );
+	}
+
+	public function testSingleFileComponent_TemplateAndScriptAndStyle(): void {
+		$template = '<template><div class="test"></div></template><script></script><style></style>';
+		$rootNode = $this->parseAndGetRootNode( $template );
+		$this->assertIsDivTest( $rootNode );
+	}
+
+	public function testSingleFileComponent_ScriptAndTemplateAndStyle(): void {
+		$template = '<script></script><template><div class="test"></div></template><style></style>';
+		$rootNode = $this->parseAndGetRootNode( $template );
+		$this->assertIsDivTest( $rootNode );
+	}
+
 	public function testEmptyDocument(): void {
 		$this->expectException( Exception::class );
 		$this->expectExceptionMessage( 'Empty document' );
@@ -37,7 +54,7 @@ class HtmlParserTest extends TestCase {
 	public function testHeadElement(): void {
 		$html = '<html><head><title>Title</title></head><body>ABC</body></html>';
 		$this->expectException( Exception::class );
-		$this->expectExceptionMessage( 'Expected <body>, got <head>' );
+		$this->expectExceptionMessage( 'Expected exactly 1 <html> child, got 2' );
 		$this->parseAndGetRootNode( $html );
 	}
 

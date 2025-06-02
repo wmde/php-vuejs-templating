@@ -19,6 +19,26 @@ class TemplatingTest extends TestCase {
 		$this->assertSame( '<div></div>', $result );
 	}
 
+	public function testSingleFileComponent(): void {
+		$template = <<< 'EOF'
+<template>
+	<!-- eslint-disable-next-line something -->
+	<div></div>
+</template>
+<script setup>
+const something = 'something';
+</script>
+<style scoped>
+.some-class {
+	font-weight: bold;
+}
+</style>
+EOF;
+		$result = $this->createAndRender( $template, [] );
+
+		$this->assertSame( '<div></div>', $result );
+	}
+
 	public function testTemplateHasOnClickHandler_RemoveHandlerFormOutput() {
 		$result = $this->createAndRender( '<div v-on:click="doStuff"></div>', [] );
 
