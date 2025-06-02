@@ -9,6 +9,8 @@
 	],
 	"license": "LGPL-2.1-only",
 	"require": {
+		"ext-dom": "*",
+		"ext-libxml": "*",
 		"php": ">=7.2"
 	},
 	"autoload": {
