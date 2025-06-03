@@ -59,7 +59,7 @@ class HtmlParser {
 			throw new Exception( 'Template should have only one root node' );
 		}
 
-		return $rootNodes->item( 0 );
+		return $rootNodes[0];
 	}
 
 	/**
@@ -81,7 +81,7 @@ class HtmlParser {
 	 */
 	public function getBodyElement( DOMDocument $document ): DOMElement {
 		$htmlElement = $this->getHtmlElement( $document );
-		$bodyElement = $htmlElement->childNodes->item( 0 );
+		$bodyElement = $htmlElement->childNodes[0];
 		if ( $bodyElement->tagName !== 'body' ) {
 			throw new Exception( "Expected <body>, got <{$bodyElement->tagName}>" );
 		}
