@@ -34,6 +34,13 @@ class HtmlParserTest extends TestCase {
 		$this->parseAndGetRootNode( '' );
 	}
 
+	public function testHeadElement(): void {
+		$html = '<html><head><title>Title</title></head><body>ABC</body></html>';
+		$this->expectException( Exception::class );
+		$this->expectExceptionMessage( 'Expected <body>, got <head>' );
+		$this->parseAndGetRootNode( $html );
+	}
+
 	public function testTwoRootNodes() {
 		$this->expectException( Exception::class );
 		$this->parseAndGetRootNode( '<p></p><p></p>' );

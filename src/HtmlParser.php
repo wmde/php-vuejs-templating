@@ -53,17 +53,39 @@ class HtmlParser {
 	 * Get the root node of the template represented by the given document.
 	 */
 	public function getRootNode( DOMDocument $document ): DOMElement {
-		if ( $document->documentElement === null ) {
-			throw new Exception( 'Empty document' );
-		}
-
-		$rootNodes = $document->documentElement->childNodes->item( 0 )->childNodes;
+		$rootNodes = $this->getBodyElement( $document )->childNodes;
 
 		if ( $rootNodes->length > 1 ) {
 			throw new Exception( 'Template should have only one root node' );
 		}
 
 		return $rootNodes->item( 0 );
+	}
+
+	/**
+	 * Get the `<html>` element of the given document.
+	 */
+	public function getHtmlElement( DOMDocument $document ): DOMElement {
+		$documentElement = $document->documentElement;
+		if ( $documentElement === null ) {
+			throw new Exception( 'Empty document' );
+		}
+		if ( $documentElement->tagName !== 'html' ) {
+			throw new Exception( "Expected <html>, got <{$documentElement->tagName}>" );
+		}
+		return $documentElement;
+	}
+
+	/**
+	 * Get the `<body>` element of the given document.
+	 */
+	public function getBodyElement( DOMDocument $document ): DOMElement {
+		$htmlElement = $this->getHtmlElement( $document );
+		$bodyElement = $htmlElement->childNodes->item( 0 );
+		if ( $bodyElement->tagName !== 'body' ) {
+			throw new Exception( "Expected <body>, got <{$bodyElement->tagName}>" );
+		}
+		return $bodyElement;
 	}
 
 }

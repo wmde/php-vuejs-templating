@@ -188,8 +188,9 @@ class Component {
 	}
 
 	private function appendHTML( DOMNode $parent, $source ) {
-		$tmpDoc = ( new HtmlParser() )->parseHtml( $source );
-		foreach ( $tmpDoc->getElementsByTagName( 'body' )->item( 0 )->childNodes as $node ) {
+		$htmlParser = new HtmlParser();
+		$tmpDoc = $htmlParser->parseHtml( $source );
+		foreach ( $htmlParser->getBodyElement( $tmpDoc )->childNodes as $node ) {
 			$node = $parent->ownerDocument->importNode( $node, true );
 			$parent->appendChild( $node );
 		}
