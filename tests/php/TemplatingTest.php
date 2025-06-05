@@ -7,6 +7,8 @@ use PHPUnit\Framework\TestCase;
 use WMDE\VueJsTemplating\Templating;
 
 /**
+ * @covers \WMDE\VueJsTemplating\Component
+ * @covers \WMDE\VueJsTemplating\HtmlParser
  * @covers \WMDE\VueJsTemplating\Templating
  */
 class TemplatingTest extends TestCase {
@@ -17,9 +19,24 @@ class TemplatingTest extends TestCase {
 		$this->assertSame( '<div></div>', $result );
 	}
 
-	public function testTemplateHasTwoRootNodes_ThrowsAnException() {
-		$this->expectException( Exception::class );
-		$this->createAndRender( '<p></p><p></p>', [] );
+	public function testSingleFileComponent(): void {
+		$template = <<< 'EOF'
+<template>
+	<!-- eslint-disable-next-line something -->
+	<div></div>
+</template>
+<script setup>
+const something = 'something';
+</script>
+<style scoped>
+.some-class {
+	font-weight: bold;
+}
+</style>
+EOF;
+		$result = $this->createAndRender( $template, [] );
+
+		$this->assertSame( '<div></div>', $result );
 	}
 
 	public function testTemplateHasOnClickHandler_RemoveHandlerFormOutput() {

@@ -4,14 +4,10 @@ namespace WMDE\VueJsTemplating;
 
 use DOMAttr;
 use DOMCharacterData;
-use DOMDocument;
 use DOMElement;
 use DOMNode;
 use DOMNodeList;
 use DOMText;
-use Exception;
-use LibXMLError;
-
 use WMDE\VueJsTemplating\JsParsing\BasicJsExpressionParser;
 use WMDE\VueJsTemplating\JsParsing\CachingExpressionParser;
 use WMDE\VueJsTemplating\JsParsing\JsExpressionParser;
@@ -19,9 +15,9 @@ use WMDE\VueJsTemplating\JsParsing\JsExpressionParser;
 class Component {
 
 	/**
-	 * @var string HTML
+	 * @var DOMElement
 	 */
-	private $template;
+	private $rootNode;
 
 	/**
 	 * @var JsExpressionParser
@@ -29,79 +25,26 @@ class Component {
 	private $expressionParser;
 
 	/**
-	 * @param string $template HTML
+	 * @param DOMElement $rootNode
 	 * @param callable[] $methods
 	 */
-	public function __construct( $template, array $methods ) {
-		$this->template = $template;
+	public function __construct( DOMElement $rootNode, array $methods ) {
+		$this->rootNode = $rootNode;
 		$this->expressionParser = new CachingExpressionParser( new BasicJsExpressionParser( $methods ) );
 	}
 
 	/**
+	 * Note: this method is not currently safe to call repeatedly
+	 * (the internal root node is modified in-place).
+	 *
 	 * @param array $data
 	 *
 	 * @return string HTML
 	 */
 	public function render( array $data ) {
-		$document = $this->parseHtml( $this->template );
+		$this->handleNode( $this->rootNode, $data );
 
-		$rootNode = $this->getRootNode( $document );
-		$this->handleNode( $rootNode, $data );
-
-		return $document->saveHTML( $rootNode );
-	}
-
-	/**
-	 * @param string $html HTML
-	 *
-	 * @return DOMDocument
-	 */
-	private function parseHtml( $html ) {
-		if ( LIBXML_VERSION < 20900 ) {
-			$entityLoaderDisabled = libxml_disable_entity_loader( true );
-		}
-		$internalErrors = libxml_use_internal_errors( true );
-		$document = new DOMDocument( '1.0', 'UTF-8' );
-
-		// Ensure $html is treated as UTF-8, see https://stackoverflow.com/a/8218649
-		// LIBXML_NOBLANKS Constant excludes "ghost nodes" to avoid violating
-		// vue's single root node constraint
-		if ( !$document->loadHTML( '<?xml encoding="utf-8" ?>' . $html, LIBXML_NOBLANKS ) ) {
-			//TODO Test failure
-		}
-
-		/** @var LibXMLError[] $errors */
-		$errors = libxml_get_errors();
-		libxml_clear_errors();
-
-		// Restore previous state
-		libxml_use_internal_errors( $internalErrors );
-		if ( LIBXML_VERSION < 20900 ) {
-			libxml_disable_entity_loader( $entityLoaderDisabled );
-		}
-
-		foreach ( $errors as $error ) {
-			//TODO html5 tags can fail parsing
-			//TODO Throw an exception
-		}
-
-		return $document;
-	}
-
-	/**
-	 * @param DOMDocument $document
-	 *
-	 * @return DOMElement
-	 * @throws Exception
-	 */
-	private function getRootNode( DOMDocument $document ) {
-		$rootNodes = $document->documentElement->childNodes->item( 0 )->childNodes;
-
-		if ( $rootNodes->length > 1 ) {
-			throw new Exception( 'Template should have only one root node' );
-		}
-
-		return $rootNodes->item( 0 );
+		return $this->rootNode->ownerDocument->saveHTML( $this->rootNode );
 	}
 
 	/**
@@ -245,8 +188,9 @@ class Component {
 	}
 
 	private function appendHTML( DOMNode $parent, $source ) {
-		$tmpDoc = $this->parseHtml( $source );
-		foreach ( $tmpDoc->getElementsByTagName( 'body' )->item( 0 )->childNodes as $node ) {
+		$htmlParser = new HtmlParser();
+		$tmpDoc = $htmlParser->parseHtml( $source );
+		foreach ( $htmlParser->getBodyElement( $tmpDoc )->childNodes as $node ) {
 			$node = $parent->ownerDocument->importNode( $node, true );
 			$parent->appendChild( $node );
 		}
