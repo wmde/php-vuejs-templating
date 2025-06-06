@@ -6,6 +6,7 @@ namespace WMDE\VueJsTemplating;
 
 use DOMDocument;
 use DOMElement;
+use DOMXPath;
 use Exception;
 use LibXMLError;
 
@@ -13,6 +14,12 @@ use LibXMLError;
  * Methods for parsing HTML strings and extracting elements from them.
  */
 class HtmlParser {
+
+	private array $components;
+
+	public function __construct( array $components = [] ) {
+		$this->components = $components;
+	}
 
 	/**
 	 * Parse the given HTML string into a DOM document.
@@ -46,7 +53,22 @@ class HtmlParser {
 			//TODO Throw an exception
 		}
 
+		$this->substituteComponents( $document );
+
 		return $document;
+	}
+
+	private function substituteComponents( DOMDocument $document ) {
+		$xpath = new DOMXPath( $document );
+		foreach ( $this->components as $componentName => $template ) {
+			$entries = $xpath->query( '//' . $componentName );
+			foreach ( $entries as $entry ) {
+				$templateRoot = $this->getBodyElement( $this->parseHtml( $template ) )->firstChild;
+				$templateNode = $document->importNode( $templateRoot, true );
+				$entry->parentNode->append( $templateNode );
+				$entry->remove();
+			}
+		}
 	}
 
 	/**
