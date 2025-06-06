@@ -63,4 +63,11 @@ class HtmlParserTest extends TestCase {
 		$this->parseAndGetRootNode( '<p></p><p></p>' );
 	}
 
+	public function testMalformedHtml(): void {
+		$htmlParser = new HtmlParser();
+		$this->expectException( Exception::class );
+		$this->expectExceptionMessage( 'Unexpected end tag' );
+		$htmlParser->parseHtml( '</p>' );
+	}
+
 }
