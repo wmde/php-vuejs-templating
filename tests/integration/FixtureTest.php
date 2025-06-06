@@ -18,7 +18,8 @@ class FixtureTest extends TestCase {
 	 * @dataProvider provideFixtures
 	 */
 	public function testPhpRenderingEqualsVueJsRendering( $template, array $data, $expectedResult ) {
-		$templating = new Templating();
+		$components = $this->loadFixtureComponents();
+		$templating = new Templating( $components );
 		$methods = [
 			'message' => 'strval',
 			'directionality' => function () {
@@ -31,6 +32,31 @@ class FixtureTest extends TestCase {
 		$this->assertEqualHtml( $expectedResult, $result );
 	}
 
+	public function loadFixtureComponents() {
+		$componentDir = __DIR__ . '/fixture/components';
+
+		$components = [];
+		/** @var DirectoryIterator $fileInfo */
+		foreach ( new DirectoryIterator( $componentDir ) as $fileInfo ) {
+			if ( $fileInfo->isDot() || $fileInfo->isDir() ) {
+				continue;
+			}
+
+			$document = new DOMDocument();
+			// Ignore all warnings issued by DOMDocument when parsing
+			// as soon as VueJs template is not actually a "valid" HTML
+			/** @noinspection UsageOfSilenceOperatorInspection */
+			// @codingStandardsIgnoreLine
+			@$document->loadHTMLFile( $fileInfo->getPathname() );
+
+			$componentName = $this->getAttribute( $document, 'template', 'component-name' );
+			$template = $this->getContents( $document, 'template' );
+
+			$components[$componentName] = $template;
+		}
+		return $components;
+	}
+
 	public function provideFixtures() {
 		$fixtureDir = __DIR__ . '/fixture';
 
@@ -38,7 +64,7 @@ class FixtureTest extends TestCase {
 
 		/** @var DirectoryIterator $fileInfo */
 		foreach ( new DirectoryIterator( $fixtureDir ) as $fileInfo ) {
-			if ( $fileInfo->isDot() ) {
+			if ( $fileInfo->isDot() || $fileInfo->isDir() ) {
 				continue;
 			}
 
@@ -65,6 +91,10 @@ class FixtureTest extends TestCase {
 		}
 
 		return $cases;
+	}
+
+	private function getAttribute( DOMDocument $document, $elementId, $attributeId ) {
+		return $document->getElementById( $elementId )->getAttribute( $attributeId );
 	}
 
 	/**
