@@ -8,9 +8,6 @@ use DOMElement;
 use DOMNode;
 use DOMNodeList;
 use DOMText;
-use WMDE\VueJsTemplating\JsParsing\BasicJsExpressionParser;
-use WMDE\VueJsTemplating\JsParsing\CachingExpressionParser;
-use WMDE\VueJsTemplating\JsParsing\JsExpressionParser;
 
 class Component {
 
@@ -20,31 +17,28 @@ class Component {
 	private $rootNode;
 
 	/**
-	 * @var JsExpressionParser
+	 * @var DOMNode An arbitrary node to reparent cloned root nodes too,
+	 * so that they can still have a parent node.
+	 * (This is required for {@link self::isRemovedFromTheDom()}.)
 	 */
-	private $expressionParser;
+	private $cloneOwner;
 
-	/**
-	 * @param DOMElement $rootNode
-	 * @param callable[] $methods
-	 */
-	public function __construct( DOMElement $rootNode, array $methods ) {
+	/** @var App */
+	private $app;
+
+	public function __construct( DOMElement $rootNode, App $app ) {
 		$this->rootNode = $rootNode;
-		$this->expressionParser = new CachingExpressionParser( new BasicJsExpressionParser( $methods ) );
+		$this->app = $app;
+
+		$this->cloneOwner = $rootNode->ownerDocument->documentElement;
 	}
 
-	/**
-	 * Note: this method is not currently safe to call repeatedly
-	 * (the internal root node is modified in-place).
-	 *
-	 * @param array $data
-	 *
-	 * @return string HTML
-	 */
-	public function render( array $data ) {
-		$this->handleNode( $this->rootNode, $data );
-
-		return $this->rootNode->ownerDocument->saveHTML( $this->rootNode );
+	public function render( array $data ): DOMElement {
+		$rootNode = $this->rootNode->cloneNode( true );
+		$this->cloneOwner->appendChild( $rootNode );
+		$this->handleNode( $rootNode, $data );
+		$this->cloneOwner->removeChild( $rootNode );
+		return $rootNode;
 	}
 
 	/**
@@ -99,8 +93,7 @@ class Component {
 			preg_match_all( $regex, $text, $matches );
 
 			foreach ( $matches['expression'] as $index => $expression ) {
-				$value = $this->expressionParser->parse( $expression )
-					->evaluate( $data );
+				$value = $this->app->evaluateExpression( $expression, $data );
 
 				$text = str_replace( $matches[0][$index], $value, $text );
 			}
@@ -119,8 +112,7 @@ class Component {
 				continue;
 			}
 
-			$value = $this->expressionParser->parse( $attribute->value )
-				->evaluate( $data );
+			$value = $this->app->evaluateExpression( $attribute->value, $data );
 
 			$name = substr( $attribute->name, 1 );
 			if ( is_bool( $value ) ) {
@@ -151,7 +143,7 @@ class Component {
 			if ( $node->hasAttribute( 'v-if' ) ) {
 				$conditionString = $node->getAttribute( 'v-if' );
 				$node->removeAttribute( 'v-if' );
-				$condition = $this->evaluateExpression( $conditionString, $data );
+				$condition = $this->app->evaluateExpression( $conditionString, $data );
 
 				if ( !$condition ) {
 					$nodesToRemove[] = $node;
@@ -217,16 +209,6 @@ class Component {
 
 			$node->parentNode->replaceChild( $newNode, $node );
 		}
-	}
-
-	/**
-	 * @param string $expression
-	 * @param array $data
-	 *
-	 * @return bool
-	 */
-	private function evaluateExpression( $expression, array $data ) {
-		return $this->expressionParser->parse( $expression )->evaluate( $data );
 	}
 
 	private function removeNode( DOMElement $node ) {
