@@ -54,11 +54,13 @@ class Component {
 			$this->handleRawHtml( $node, $data );
 
 			if ( !$this->isRemovedFromTheDom( $node ) ) {
-				$this->handleAttributeBinding( $node, $data );
-				$this->handleIf( $node->childNodes, $data );
+				if ( !$this->handleComponent( $node, $data ) ) {
+					$this->handleAttributeBinding( $node, $data );
+					$this->handleIf( $node->childNodes, $data );
 
-				foreach ( iterator_to_array( $node->childNodes ) as $childNode ) {
-					$this->handleNode( $childNode, $data );
+					foreach ( iterator_to_array( $node->childNodes ) as $childNode ) {
+						$this->handleNode( $childNode, $data );
+					}
 				}
 			}
 		}
@@ -103,6 +105,30 @@ class Component {
 				$node->parentNode->replaceChild( $newNode, $node );
 			}
 		}
+	}
+
+	/** @return bool true if it was a component, false otherwise */
+	private function handleComponent( DOMElement $node, array $data ): bool {
+		if ( strpos( $node->tagName, '-' ) === false ) {
+			return false;
+		}
+		$componentName = $node->tagName;
+
+		$componentData = [];
+		foreach ( $node->attributes as $attribute ) {
+			if ( str_starts_with( $attribute->name, ':' ) ) { // TODO also v-bind: ?
+				$name = substr( $attribute->name, 1 );
+				$value = $this->app->evaluateExpression( $attribute->value, $data );
+			} else {
+				$name = $attribute->name;
+				$value = $attribute->value;
+			}
+			$componentData[$name] = $value;
+		}
+		$rendered = $this->app->renderComponentToDOM( $componentName, $componentData );
+		// TODO use adoptNode() instead of importNode() in PHP 8.3+ (see php-src commit ed6df1f0ad)
+		$node->replaceWith( $node->ownerDocument->importNode( $rendered, true ) );
+		return true;
 	}
 
 	private function handleAttributeBinding( DOMElement $node, array $data ) {

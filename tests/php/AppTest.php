@@ -38,4 +38,27 @@ class AppTest extends TestCase {
 		$this->assertTrue( $called );
 	}
 
+	public function testNestedComponents(): void {
+		$app = new App( [] );
+		$app->registerComponentTemplate( 'root', '<div><x-a :a="rootVar"></x-a></div>' );
+		$app->registerComponentTemplate( 'x-a', '<p><x-b :b="a"></x-b></p>' );
+		$app->registerComponentTemplate( 'x-b', '<span>{{ b }}</span>' );
+
+		$result = $app->renderComponent( 'root', [ 'rootVar' => 'text' ] );
+
+		$this->assertSame( '<div><p><span>text</span></p></div>', $result );
+	}
+
+	public function testNestedComponentObjectProp(): void {
+		$app = new App( [] );
+		$app->registerComponentTemplate( 'root', '<div><x-a :obj="rootObj"></x-a></div>' );
+		$app->registerComponentTemplate( 'x-a', '<p>obj = { a: {{ obj.a }}, b: {{ obj.b }} }</p>' );
+
+		$result = $app->renderComponent( 'root', [
+			'rootObj' => [ 'a' => 'A', 'b' => 'B' ],
+		] );
+
+		$this->assertSame( '<div><p>obj = { a: A, b: B }</p></div>', $result );
+	}
+
 }
