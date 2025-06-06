@@ -88,7 +88,7 @@ class Component {
 	 */
 	private function replaceMustacheVariables( DOMNode $node, array $data ) {
 		if ( $node instanceof DOMText ) {
-			$text = $node->wholeText;
+			$text = $node->textContent;
 
 			$regex = '/\{\{(?P<expression>.*?)\}\}/x';
 			preg_match_all( $regex, $text, $matches );
@@ -100,7 +100,7 @@ class Component {
 				$text = str_replace( $matches[0][$index], $value, $text );
 			}
 
-			if ( $text !== $node->wholeText ) {
+			if ( $text !== $node->textContent ) {
 				$newNode = $node->ownerDocument->createTextNode( $text );
 				$node->parentNode->replaceChild( $newNode, $node );
 			}

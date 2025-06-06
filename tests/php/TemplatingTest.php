@@ -272,6 +272,15 @@ EOF;
 		$this->assertSame( '<p><a attr1="VALUE1"></a><a attr1="VALUE2"></a></p>', $result );
 	}
 
+	public function testMustacheAfterVIf(): void {
+		$result = $this->createAndRender(
+			'<p>a: {{ a }} <span v-if="b">b: {{ b }} </span>c: {{c }}</p>',
+			[ 'a' => 'A', 'b' => false, 'c' => 'C' ]
+		);
+
+		$this->assertSame( '<p>a: A c: C</p>', $result );
+	}
+
 	/**
 	 * @param string $template HTML
 	 * @param array $data
