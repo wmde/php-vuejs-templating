@@ -110,7 +110,7 @@ class Component {
 	private function handleAttributeBinding( DOMElement $node, array $data ) {
 		/** @var DOMAttr $attribute */
 		foreach ( iterator_to_array( $node->attributes ) as $attribute ) {
-			if ( !preg_match( '/^:[\w-]+$/', $attribute->name ) ) {
+			if ( !str_starts_with( $attribute->name, ':' ) ) {
 				continue;
 			}
 
