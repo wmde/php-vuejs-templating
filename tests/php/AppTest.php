@@ -146,4 +146,14 @@ HTML;
 		$this->assertSame( $expected, $result );
 	}
 
+	public function testCallableComponent(): void {
+		$app = new App( [] );
+		$app->registerComponentTemplate( 'root', '<div><x-a :a="rootVar"></x-a></div>' );
+		$app->registerComponentCallable( 'x-a', fn ( $data ) => '<p>' . strtoupper( $data['a'] ) . '</p>' );
+
+		$result = $app->renderComponent( 'root', [ 'rootVar' => 'text' ] );
+
+		$this->assertSame( '<div><p>TEXT</p></div>', $result );
+	}
+
 }

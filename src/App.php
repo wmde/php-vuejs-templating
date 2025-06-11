@@ -21,6 +21,9 @@ class App {
 	/** @var (Component|string|callable)[] */
 	private $components = [];
 
+	/** @var callable[] */
+	private $callableComponents = [];
+
 	private $componentSetups = [];
 
 	/**
@@ -51,6 +54,10 @@ class App {
 		}
 	}
 
+	public function registerComponentCallable( string $name, callable $callable ): void {
+		$this->callableComponents[$name] = $callable;
+	}
+
 	public function evaluateExpression( string $expression, array $data ) {
 		return $this->expressionParser->parse( $expression )
 			->evaluate( $data );
@@ -66,6 +73,14 @@ class App {
 		if ( $setup !== null ) {
 			$data = $setup( $data );
 		}
+
+		$callableComponent = $this->callableComponents[$componentName] ?? null;
+		if ( $callableComponent !== null ) {
+			$html = $callableComponent( $data );
+			$document = $this->htmlParser->parseHtml( $html );
+			return $this->htmlParser->getRootNode( $document );
+		}
+
 		return $this->getComponent( $componentName )
 			->render( $data );
 	}
