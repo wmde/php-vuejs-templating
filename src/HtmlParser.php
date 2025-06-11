@@ -43,7 +43,7 @@ class HtmlParser {
 
 		$exception = null;
 		foreach ( $errors as $error ) {
-			if ( strpos( $error->message, 'Tag template invalid' ) === 0 ) {
+			if ( str_starts_with( $error->message, 'Tag template invalid' ) ) {
 				continue;
 			}
 			$exception = new Exception( $error->message, $error->code, $exception );

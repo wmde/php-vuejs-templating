@@ -76,7 +76,7 @@ class Component {
 		}
 		/** @var DOMAttr $attribute */
 		foreach ( $node->attributes as $attribute ) {
-			if ( strpos( $attribute->name, 'v-on:' ) === 0 ) {
+			if ( str_starts_with( $attribute->name, 'v-on:' ) ) {
 				$node->removeAttribute( $attribute->name );
 			}
 		}
