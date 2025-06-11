@@ -74,11 +74,16 @@ class Component {
 		if ( $this->isTextNode( $node ) ) {
 			return;
 		}
+		// Removing items while iterating breaks iteration, so defer attribute removal
+		$attributesToRemove = [];
 		/** @var DOMAttr $attribute */
 		foreach ( $node->attributes as $attribute ) {
 			if ( str_starts_with( $attribute->name, 'v-on:' ) ) {
-				$node->removeAttribute( $attribute->name );
+				$attributesToRemove[] = $attribute;
 			}
+		}
+		foreach ( $attributesToRemove as $attribute ) {
+			$node->removeAttributeNode( $attribute );
 		}
 	}
 

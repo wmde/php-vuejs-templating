@@ -63,6 +63,12 @@ EOF;
 		$this->assertSame( '<p><b><a></a></b></p>', $result );
 	}
 
+	public function testTemplateHasMultipleEventHandlers_RemoveAll(): void {
+		$result = $this->createAndRender( '<p v-on:click="x" v-on:keypress="y"></p>', [] );
+
+		$this->assertSame( '<p></p>', $result );
+	}
+
 	public function testTemplateWithSingleMustacheVariable_ReplacesVariableWithGivenValue() {
 		$result = $this->createAndRender( '<p>{{value}}</p>', [ 'value' => 'some value' ] );
 
