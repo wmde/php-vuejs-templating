@@ -19,9 +19,9 @@ class BasicJsExpressionParser implements JsExpressionParser {
 	 */
 	public function parse( $expression ) {
 		$expression = $this->normalizeExpression( $expression );
-		if ( strncmp( $expression, '!', 1 ) === 0 ) {
+		if ( str_starts_with( $expression, '!' ) ) {
 			return new NegationOperator( $this->parse( substr( $expression, 1 ) ) );
-		} elseif ( strncmp( $expression, "'", 1 ) === 0 ) {
+		} elseif ( str_starts_with( $expression, "'" ) && str_ends_with( $expression, "'" ) ) {
 			return new StringLiteral( substr( $expression, 1, -1 ) );
 		} elseif ( preg_match( '/^(\w+)\((.*)\)$/', $expression, $matches ) ) {
 			$methodName = $matches[1];
