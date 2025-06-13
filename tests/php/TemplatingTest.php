@@ -39,25 +39,25 @@ EOF;
 		$this->assertSame( '<div></div>', $result );
 	}
 
-	public function testTemplateHasOnClickHandler_RemoveHandlerFormOutput() {
+	public function testTemplateHasOnClickHandler_RemoveHandlerFromOutput() {
 		$result = $this->createAndRender( '<div v-on:click="doStuff"></div>', [] );
 
 		$this->assertSame( '<div></div>', $result );
 	}
 
-	public function testTemplateHasOnClickHandlerAndPreventDefault_RemoveHandlerFormOutput() {
+	public function testTemplateHasOnClickHandlerAndPreventDefault_RemoveHandlerFromOutput() {
 		$result = $this->createAndRender( '<div v-on:click.prevent="doStuff"></div>', [] );
 
 		$this->assertSame( '<div></div>', $result );
 	}
 
-	public function testTemplateHasOnClickHandlerInSomeChildNode_RemoveHandlerFormOutput() {
+	public function testTemplateHasOnClickHandlerInSomeChildNode_RemoveHandlerFromOutput() {
 		$result = $this->createAndRender( '<p><a v-on:click="doStuff"></a></p>', [] );
 
 		$this->assertSame( '<p><a></a></p>', $result );
 	}
 
-	public function testTemplateHasOnClickHandlerInGrandChildNode_RemoveHandlerFormOutput() {
+	public function testTemplateHasOnClickHandlerInGrandChildNode_RemoveHandlerFromOutput() {
 		$result = $this->createAndRender( '<p><b><a v-on:click="doStuff"></a></b></p>', [] );
 
 		$this->assertSame( '<p><b><a></a></b></p>', $result );
