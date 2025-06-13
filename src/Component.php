@@ -74,7 +74,10 @@ class Component {
 		$attributesToRemove = [];
 		/** @var DOMAttr $attribute */
 		foreach ( $node->attributes as $attribute ) {
-			if ( str_starts_with( $attribute->name, 'v-on:' ) ) {
+			if (
+				str_starts_with( $attribute->name, 'v-on:' ) ||
+				str_starts_with( $attribute->name, '@' )
+			) {
 				$attributesToRemove[] = $attribute;
 			}
 		}

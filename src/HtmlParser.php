@@ -48,6 +48,10 @@ class HtmlParser {
 				// discard "Tag xyz invalid" messages from libxml2 < 2.14.0(?)
 				continue;
 			}
+			if ( $msg === "error parsing attribute name\n" ) {
+				// discard these messages (e.g. @event="") from libxml < 2.14.0(?)
+				continue;
+			}
 			$exception = new Exception( $msg, $error->code, $exception );
 		}
 		if ( $exception !== null ) {
