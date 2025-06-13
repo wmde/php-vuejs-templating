@@ -63,6 +63,12 @@ EOF;
 		$this->assertSame( '<p><b><a></a></b></p>', $result );
 	}
 
+	public function testTemplateHasOnClickHandlerWithShorthand_RemoveHandlerFromOutput(): void {
+		$result = $this->createAndRender( '<p @click="x"></p>', [] );
+
+		$this->assertSame( '<p></p>', $result );
+	}
+
 	public function testTemplateHasMultipleEventHandlers_RemoveAll(): void {
 		$result = $this->createAndRender( '<p v-on:click="x" v-on:keypress="y"></p>', [] );
 
