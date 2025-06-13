@@ -43,10 +43,12 @@ class HtmlParser {
 
 		$exception = null;
 		foreach ( $errors as $error ) {
-			if ( str_starts_with( $error->message, 'Tag template invalid' ) ) {
+			$msg = $error->message;
+			if ( str_starts_with( $msg, 'Tag ' ) && str_ends_with( $msg, " invalid\n" ) ) {
+				// discard "Tag xyz invalid" messages from libxml2 < 2.14.0(?)
 				continue;
 			}
-			$exception = new Exception( $error->message, $error->code, $exception );
+			$exception = new Exception( $msg, $error->code, $exception );
 		}
 		if ( $exception !== null ) {
 			throw $exception;

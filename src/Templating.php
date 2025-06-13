@@ -12,11 +12,9 @@ class Templating {
 	 * @return string
 	 */
 	public function render( $template, array $data, array $methods = [] ) {
-		$htmlParser = new HtmlParser();
-		$document = $htmlParser->parseHtml( $template );
-		$rootNode = $htmlParser->getRootNode( $document );
-		$component = new Component( $rootNode, $methods );
-		return $component->render( $data );
+		$app = new App( $methods );
+		$app->registerComponentTemplate( 'root', $template );
+		return $app->renderComponent( 'root', $data );
 	}
 
 }
