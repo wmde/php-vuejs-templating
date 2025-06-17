@@ -21,6 +21,8 @@ class App {
 	/** @var (Component|string|callable)[] */
 	private $components = [];
 
+	private $componentSetups = [];
+
 	/**
 	 * @param callable[] $methods The available methods.
 	 * The key is the method name, the value is the corresponding callable.
@@ -36,10 +38,17 @@ class App {
 	 * @param string $name The component name.
 	 * @param string|callable $template Either the template HTML as a string,
 	 * or a callable that will return the template HTML as a string when called with no arguments.
+	 * @param callable|null $setup An optional setup function.
+	 * If set, the callable is called with the array of data used to render the component,
+	 * and whichever array it returns is then used to actually render the template.
+	 * This can be used, for example, to add additional data (the equivalent of `computed` in JS).
 	 * @return void
 	 */
-	public function registerComponentTemplate( string $name, $template ): void {
+	public function registerComponentTemplate( string $name, $template, ?callable $setup = null ): void {
 		$this->components[$name] = $template;
+		if ( $setup !== null ) {
+			$this->componentSetups[$name] = $setup;
+		}
 	}
 
 	public function evaluateExpression( string $expression, array $data ) {
@@ -53,6 +62,10 @@ class App {
 	}
 
 	public function renderComponentToDOM( string $componentName, array $data ): DOMElement {
+		$setup = $this->componentSetups[$componentName] ?? null;
+		if ( $setup !== null ) {
+			$data = $setup( $data );
+		}
 		return $this->getComponent( $componentName )
 			->render( $data );
 	}
