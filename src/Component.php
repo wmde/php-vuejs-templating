@@ -126,6 +126,8 @@ class Component {
 				$name = $attribute->name;
 				$value = $attribute->value;
 			}
+			// template kebab-case -> JS camelCase
+			$name = preg_replace_callback( '/-(\w)/', fn ( $m ) => strtoupper( $m[1] ), $name );
 			$componentData[$name] = $value;
 		}
 		$rendered = $this->app->renderComponentToDOM( $componentName, $componentData );
