@@ -61,4 +61,17 @@ class AppTest extends TestCase {
 		$this->assertSame( '<div><p>obj = { a: A, b: B }</p></div>', $result );
 	}
 
+	public function testComponentPropKebabCase(): void {
+		$app = new App( [] );
+		$app->registerComponentTemplate(
+			'root',
+			'<div><x-a some-long-prop="A B C"></x-a><x-a :some-long-prop="someLongVar"></x-a></div>'
+		);
+		$app->registerComponentTemplate( 'x-a', '<p>{{ someLongProp }}</p>' );
+
+		$result = $app->renderComponent( 'root', [ 'someLongVar' => 'X Y Z' ] );
+
+		$this->assertSame( '<div><p>A B C</p><p>X Y Z</p></div>', $result );
+	}
+
 }
