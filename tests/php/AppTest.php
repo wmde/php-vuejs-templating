@@ -74,4 +74,66 @@ class AppTest extends TestCase {
 		$this->assertSame( '<div><p>A B C</p><p>X Y Z</p></div>', $result );
 	}
 
+	public function testComputedProperties(): void {
+		$app = new App( [] );
+
+		$rootTemplate = <<< HTML
+<template>
+	<div>
+		<x-property :property-id="propertyId"></x-property>
+	</div>
+</template>
+<script>
+// import ...
+module.exports = exports = defineComponent( {
+	// name, components, props, ...
+	computed: {
+		propertyId() {
+			return statement.mainsnak.property;
+		}
+	}
+} );
+</script>
+HTML;
+		$app->registerComponentTemplate( 'root', $rootTemplate, function ( array $data ): array {
+			$data['propertyId'] = $data['statement']['mainsnak']['property'];
+			return $data;
+		} );
+
+		$propertyTemplate = <<< HTML
+<template>
+	<a :href="propertyUrl">{{ propertyLabel }}</a>
+</template>
+<script>
+// import ...
+module.exports = exports = defineComponent( {
+	// name, props, ...
+	computed: {
+		propertyUrl() {
+			return util.getPropertyUrl( this.propertyId );
+		},
+		propertyLabel() {
+			return labelsStore.getLabel( this.propertyId );
+		}
+	}
+} );
+</script>
+HTML;
+		$app->registerComponentTemplate( 'x-property', $propertyTemplate, function ( array $data ): array {
+			$propertyId = $data['propertyId'];
+			$data['propertyUrl'] = "https://wiki.example/wiki/Property:$propertyId";
+			$data['propertyLabel'] = "property $propertyId";
+			return $data;
+		} );
+
+		$result = $app->renderComponent( 'root',
+			[ 'statement' => [ 'mainsnak' => [ 'property' => 'P123' ] ] ] );
+
+		$expected = <<< HTML
+<div>
+		<a href="https://wiki.example/wiki/Property:P123">property P123</a></div>
+HTML;
+		$this->assertSame( $expected, $result );
+	}
+
 }
