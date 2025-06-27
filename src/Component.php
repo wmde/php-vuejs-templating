@@ -204,8 +204,9 @@ class Component {
 		if ( $node->hasAttribute( 'v-for' ) ) {
 			list( $itemName, $listName ) = explode( ' in ', $node->getAttribute( 'v-for' ) );
 			$node->removeAttribute( 'v-for' );
+			$node->removeAttribute( ':key' );
 
-			foreach ( $data[$listName] as $item ) {
+			foreach ( $this->app->evaluateExpression( $listName, $data ) as $item ) {
 				$newNode = $node->cloneNode( true );
 				$node->parentNode->insertBefore( $newNode, $node );
 				$this->handleNode( $newNode, array_merge( $data, [ $itemName => $item ] ) );
