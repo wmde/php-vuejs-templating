@@ -207,6 +207,15 @@ EOF;
 		$this->assertSame( '<p><a></a></p>', $result );
 	}
 
+	public function testTemplateWithForLoopAndMemberExpressionForData_RenderedOnce() {
+		$result = $this->createAndRender(
+			'<p><a v-for="item in list.data"></a></p>',
+			[ 'list' => [ 'data' => [ 1 ] ] ]
+		);
+
+		$this->assertSame( '<p><a></a></p>', $result );
+	}
+
 	public function testTemplateWithForLoopAndMultipleElementsInArrayToIterate_RenderedMultipleTimes() {
 		$result = $this->createAndRender(
 			'<p><a v-for="item in list"></a></p>',
@@ -219,6 +228,15 @@ EOF;
 	public function testTemplateWithForLoopMustache_RendersCorrectValues() {
 		$result = $this->createAndRender(
 			'<p><a v-for="item in list">{{item}}</a></p>',
+			[ 'list' => [ 1, 2 ] ]
+		);
+
+		$this->assertSame( '<p><a>1</a><a>2</a></p>', $result );
+	}
+
+	public function testTemplateWithForLoopAndKey_DropsKeyAttributeFromOutput() {
+		$result = $this->createAndRender(
+			'<p><a v-for="item in list" :key="item">{{item}}</a></p>',
 			[ 'list' => [ 1, 2 ] ]
 		);
 
