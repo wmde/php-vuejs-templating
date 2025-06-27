@@ -253,8 +253,8 @@ EOF;
 
 	public function testTemplateWithPropertyAccessInMustache_CorrectValueIsRendered() {
 		$result = $this->createAndRender(
-			'<p>{{var.property}}</p>',
-			[ 'var' => [ 'property' => 'value' ] ]
+			'<p>{{variable.property}}</p>',
+			[ 'variable' => [ 'property' => 'value' ] ]
 		);
 
 		$this->assertSame( '<p>value</p>', $result );
@@ -262,8 +262,8 @@ EOF;
 
 	public function testTemplateWithMethodAccessInAttributeBinding_CorrectValueIsRendered() {
 		$result = $this->createAndRender(
-			'<p :attr1="strtoupper(var.property)"></p>',
-			[ 'var' => [ 'property' => 'value' ] ],
+			'<p :attr1="strtoupper(variable.property)"></p>',
+			[ 'variable' => [ 'property' => 'value' ] ],
 			[ 'strtoupper' => 'strtoupper' ]
 		);
 
