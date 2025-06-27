@@ -8,6 +8,7 @@ use DOMElement;
 use DOMNode;
 use DOMNodeList;
 use DOMText;
+use RuntimeException;
 
 class Component {
 
@@ -136,6 +137,26 @@ class Component {
 		return true;
 	}
 
+	private function handleArrayAttributeBinding( DOMElement $node, string $name, array $value ) {
+		if ( $name !== 'class' ) {
+			throw new RuntimeException( 'Array-valued data invalid for "' . $name . '" attribute' );
+		}
+		$existingParts = [];
+		if ( $node->getAttribute( $name ) ) {
+			$existingParts = explode( " ", $node->getAttribute( $name ) );
+		}
+		if ( array_is_list( $value ) ) {
+			$existingParts = array_merge( $existingParts, $value );
+		} else {
+			foreach ( $value as $key => $addKey ) {
+				if ( $addKey ) {
+					array_unshift( $existingParts, $key );
+				}
+			}
+		}
+		$node->setAttribute( $name, implode( " ", $existingParts ) );
+	}
+
 	private function handleAttributeBinding( DOMElement $node, array $data ) {
 		/** @var DOMAttr $attribute */
 		foreach ( iterator_to_array( $node->attributes ) as $attribute ) {
@@ -150,6 +171,8 @@ class Component {
 				if ( $value ) {
 					$node->setAttribute( $name, $name );
 				}
+			} elseif ( is_array( $value ) ) {
+				$this->handleArrayAttributeBinding( $node, $name, $value );
 			} else {
 				$node->setAttribute( $name, $value );
 			}
