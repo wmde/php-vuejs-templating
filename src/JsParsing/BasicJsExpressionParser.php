@@ -1,49 +1,25 @@
 <?php
 
+declare( strict_types = 1 );
+
 namespace WMDE\VueJsTemplating\JsParsing;
 
-use RuntimeException;
+use Peast\Peast;
 
 class BasicJsExpressionParser implements JsExpressionParser {
 
-	private $methods;
+	private PeastExpressionConverter $expressionConverter;
 
 	public function __construct( array $methods ) {
-		$this->methods = $methods;
+		$this->expressionConverter = new PeastExpressionConverter( $methods );
 	}
 
-	/**
-	 * @param string $expression
-	 *
-	 * @return ParsedExpression
-	 */
+	/** @inheritDoc */
 	public function parse( $expression ) {
-		$expression = $this->normalizeExpression( $expression );
-		if ( str_starts_with( $expression, '!' ) ) {
-			return new NegationOperator( $this->parse( substr( $expression, 1 ) ) );
-		} elseif ( str_starts_with( $expression, "'" ) && str_ends_with( $expression, "'" ) ) {
-			return new StringLiteral( substr( $expression, 1, -1 ) );
-		} elseif ( preg_match( '/^(\w+)\((.*)\)$/', $expression, $matches ) ) {
-			$methodName = $matches[1];
-			if ( !array_key_exists( $methodName, $this->methods ) ) {
-				throw new RuntimeException( "Method '{$methodName}' is undefined" );
-			}
-			$method = $this->methods[$methodName];
-			$args = [ $this->parse( $matches[2] ) ];
-			return new MethodCall( $method, $args );
-		} else {
-			$parts = explode( '.', $expression );
-			return new VariableAccess( $parts );
-		}
-	}
+		$pexp = Peast::ES2017( "($expression)" )->parse();
+		$body = $pexp->getBody();
 
-	/**
-	 * @param string $expression
-	 *
-	 * @return string
-	 */
-	protected function normalizeExpression( $expression ) {
-		return trim( $expression );
+		return $this->expressionConverter->convertExpression( $body[0]->getExpression()->getExpression() );
 	}
 
 }

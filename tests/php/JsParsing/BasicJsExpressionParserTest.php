@@ -42,8 +42,8 @@ class BasicJsExpressionParserTest extends TestCase {
 			'strtoupper' => 'strtoupper',
 		] );
 
-		$parsedExpression = $jsExpressionEvaluator->parse( 'strtoupper(var)' );
-		$result = $parsedExpression->evaluate( [ 'var' => 'abc' ] );
+		$parsedExpression = $jsExpressionEvaluator->parse( 'strtoupper(somevar)' );
+		$result = $parsedExpression->evaluate( [ 'somevar' => 'abc' ] );
 
 		$this->assertSame( 'ABC', $result );
 	}
@@ -68,9 +68,9 @@ class BasicJsExpressionParserTest extends TestCase {
 		] );
 
 		$parsedExpression = $jsExpressionEvaluator->parse(
-			' strrev( strtoupper( var ) ) '
+			' strrev( strtoupper( somevar ) ) '
 		);
-		$result = $parsedExpression->evaluate( [ 'var' => 'abc' ] );
+		$result = $parsedExpression->evaluate( [ 'somevar' => 'abc' ] );
 
 		$this->assertSame( 'CBA', $result );
 	}
@@ -84,4 +84,36 @@ class BasicJsExpressionParserTest extends TestCase {
 		$this->assertEquals( 'some string', $result );
 	}
 
+	public function testCanParse_simple_dictionary(): void {
+		$jsExpressionEvaluator = new BasicJsExpressionParser( [] );
+
+		$parsedExpression = $jsExpressionEvaluator->parse( "{ key: testProperty }" );
+		$result = $parsedExpression->evaluate( [ 'testProperty' => 1 ] );
+
+		$this->assertSame( [ "key" => 1 ], $result );
+	}
+
+	public function testCanParse_nested_values(): void {
+		$jsExpressionEvaluator = new BasicJsExpressionParser( [] );
+
+		$parsedExpression = $jsExpressionEvaluator->parse( "{ key: testObject.testDelegate.testProperty }" );
+		$result = $parsedExpression->evaluate( [ 'testObject' => [ 'testDelegate' => [ 'testProperty' => 1 ] ] ] );
+
+		$this->assertSame( [ "key" => 1 ], $result );
+	}
+
+	public function testCanParse_dictionary_with_string_keys(): void {
+		$jsExpressionEvaluator = new BasicJsExpressionParser( [] );
+
+		$parsedExpression = $jsExpressionEvaluator->parse(
+			"{ 'wikibase-mex-icon-expand-x-small': !showReferences.P321, " .
+			"'wikibase-mex-icon-collapse-x-small': showReferences.P321 }"
+		);
+		$result = $parsedExpression->evaluate( [ 'showReferences' => [ 'P321' => false ] ] );
+
+		$this->assertSame( [
+			"wikibase-mex-icon-expand-x-small" => true,
+			"wikibase-mex-icon-collapse-x-small" => false
+		], $result );
+	}
 }
