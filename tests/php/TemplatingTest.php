@@ -311,6 +311,41 @@ EOF;
 		$this->assertSame( '<p>a: A c: C</p>', $result );
 	}
 
+	public function testTemplateWithArrayValuedClassAttribute() {
+		$result = $this->createAndRender(
+			'<p><a :class="list">Link</a></p>',
+			[ 'list' => [ 'one_class', 'another_class' ] ]
+		);
+
+		$this->assertSame( '<p><a class="one_class another_class">Link</a></p>', $result );
+	}
+
+	public function testTemplateWithObjectValuedClassAttribute() {
+		$result = $this->createAndRender(
+			'<p><a :class="list">Link</a></p>',
+			[ 'list' => [ 'one_class' => true, 'another_class' => false ] ]
+		);
+
+		$this->assertSame( '<p><a class="one_class">Link</a></p>', $result );
+	}
+
+	public function testTemplateWithObjectValuedClassAttribute_UnionWithExistingAttributes() {
+		$result = $this->createAndRender(
+			'<p><a class="another_class" :class="list">Link</a></p>',
+			[ 'list' => [ 'one_class' => true, 'another_class' => false ] ]
+		);
+
+		$this->assertSame( '<p><a class="one_class another_class">Link</a></p>', $result );
+	}
+
+	public function testTemplateWithObjectValuedNonClassAttribute_ThrowsError() {
+		$this->expectException( Exception::class );
+		$this->createAndRender(
+			'<p><a :my-attr="list">Link</a></p>',
+			[ 'list' => [ 'one_class' => true, 'another_class' => false ] ]
+		);
+	}
+
 	/**
 	 * @param string $template HTML
 	 * @param array $data
