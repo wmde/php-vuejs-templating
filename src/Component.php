@@ -87,6 +87,13 @@ class Component {
 		}
 	}
 
+	private function convertDataValueToString( $value ) {
+		if ( is_string( $value ) ) {
+			return $value;
+		}
+		return json_encode( $value );
+	}
+
 	/**
 	 * @param DOMNode $node
 	 * @param array $data
@@ -100,8 +107,7 @@ class Component {
 
 			foreach ( $matches['expression'] as $index => $expression ) {
 				$value = $this->app->evaluateExpression( $expression, $data );
-
-				$text = str_replace( $matches[0][$index], $value, $text );
+				$text = str_replace( $matches[0][$index], $this->convertDataValueToString( $value ), $text );
 			}
 
 			if ( $text !== $node->textContent ) {

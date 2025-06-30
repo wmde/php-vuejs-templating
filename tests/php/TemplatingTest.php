@@ -346,6 +346,22 @@ EOF;
 		);
 	}
 
+	public function testMoustacheVariableWithArrayListTypeSubstitution() {
+		$result = $this->createAndRender(
+			'<p>{{ my.data.variable }}</p>',
+			[ 'my' => [ 'data' => [ 'variable' => [ 1, 2, 3 ] ] ] ]
+		);
+		$this->assertSame( '<p>[1,2,3]</p>', $result );
+	}
+
+	public function testMoustacheVariableWithArrayObjectTypeSubstitution() {
+		$result = $this->createAndRender(
+			'<p>{{ my.data.variable }}</p>',
+			[ 'my' => [ 'data' => [ 'variable' => [ "a" => "b", "c" => "d" ] ] ] ]
+		);
+		$this->assertSame( '<p>{"a":"b","c":"d"}</p>', $result );
+	}
+
 	/**
 	 * @param string $template HTML
 	 * @param array $data
