@@ -362,6 +362,21 @@ EOF;
 		$this->assertSame( '<p>{"a":"b","c":"d"}</p>', $result );
 	}
 
+	public function testTemplateWithBooleanExpression() {
+		$result = $this->createAndRender(
+			'<div><div v-if="myvar === \'myvalue\'"><p>Paragraph</p></div></div>',
+			[ 'myvar' => 'myvalue' ]
+		);
+
+		$this->assertSame( '<div><div><p>Paragraph</p></div></div>', $result );
+	}
+
+	public function testTemplateWithBooleanValueInIf() {
+		$result = $this->createAndRender( '<p><a v-if="false"></a></p>', [ 'variable' => true ] );
+
+		$this->assertSame( '<p></p>', $result );
+	}
+
 	/**
 	 * @param string $template HTML
 	 * @param array $data

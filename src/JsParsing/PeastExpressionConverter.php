@@ -4,10 +4,13 @@ declare( strict_types = 1 );
 
 namespace WMDE\VueJsTemplating\JsParsing;
 
+use Peast\Syntax\Node\BinaryExpression as PeastBinaryExpression;
+use Peast\Syntax\Node\BooleanLiteral as PeastBooleanLiteral;
 use Peast\Syntax\Node\CallExpression;
 use Peast\Syntax\Node\Expression;
 use Peast\Syntax\Node\Identifier;
 use Peast\Syntax\Node\MemberExpression;
+use Peast\Syntax\Node\NumericLiteral as PeastNumericLiteral;
 use Peast\Syntax\Node\ObjectExpression;
 use Peast\Syntax\Node\StringLiteral as PeastStringLiteral;
 use Peast\Syntax\Node\UnaryExpression;
@@ -71,6 +74,12 @@ class PeastExpressionConverter {
 		return new JsDictionary( $parsedExpressionMap );
 	}
 
+	protected function convertBinaryExpression( PeastBinaryExpression $expression ) {
+		$lexp = $this->convertExpression( $expression->getLeft() );
+		$rexp = $this->convertExpression( $expression->getRight() );
+		return new BinaryExpression( $lexp, $rexp, $expression->getOperator() );
+	}
+
 	public function convertExpression( Expression $expression ) {
 		return match( get_class( $expression ) ) {
 			UnaryExpression::class => $this->convertUnaryExpression( $expression ),
@@ -79,6 +88,9 @@ class PeastExpressionConverter {
 			Identifier::class => new VariableAccess( [ $expression->getName() ] ),
 			CallExpression::class => $this->convertCallExpression( $expression ),
 			ObjectExpression::class => $this->convertObjectExpression( $expression ),
+			PeastBooleanLiteral::class => new BooleanLiteral( $expression->getValue() ),
+			PeastNumericLiteral::class => new NumericLiteral( $expression->getValue() ),
+			PeastBinaryExpression::class => $this->convertBinaryExpression( $expression ),
 			default => throw new RuntimeException(
 				'Unable to parse complex expression of type ' . get_class( $expression )
 			)
