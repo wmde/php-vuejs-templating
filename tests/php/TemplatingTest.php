@@ -192,6 +192,36 @@ EOF;
 		$this->assertSame( '<p><a>else</a></p>', $result );
 	}
 
+	public function testTemplateWithElseIfBlockAndTruthfulCondition_IfAndElseRemoved() {
+		$result = $this->createAndRender(
+			'<p><a v-if="variable">if</a><a v-else-if="other_variable">else if</a>' .
+				'<a v-else>else</a></p>',
+			[ 'variable' => false, 'other_variable' => true ]
+		);
+
+		$this->assertSame( '<p><a>else if</a></p>', $result );
+	}
+
+	public function testTemplateWithElseIfBlockAndTruthfulCondition_OnlyFirstElseIfShows() {
+		$result = $this->createAndRender(
+			'<p><a v-if="variable">if</a><a v-else-if="other_variable">else if</a>' .
+				'<a v-else-if="still_another">another else</a><a v-else>else</a></p>',
+			[ 'variable' => false, 'other_variable' => true, 'still_another' => true ]
+		);
+
+		$this->assertSame( '<p><a>else if</a></p>', $result );
+	}
+
+	public function testTemplateWithElseIfBlockAndTruthfulIfAndElseIfCondition_IfElseRemoved() {
+		$result = $this->createAndRender(
+			'<p><a v-if="variable">if</a><a v-else-if="other_variable">else if</a>' .
+				'<a v-else>else</a></p>',
+			[ 'variable' => true, 'other_variable' => true ]
+		);
+
+		$this->assertSame( '<p><a>if</a></p>', $result );
+	}
+
 	public function testTemplateWithForLoopAndEmptyArrayToIterate_NotRendered() {
 		$result = $this->createAndRender( '<p><a v-for="item in list"></a></p>', [ 'list' => [] ] );
 
