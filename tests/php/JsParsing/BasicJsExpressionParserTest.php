@@ -2,6 +2,7 @@
 
 namespace WMDE\VueJsTemplating\Test\JsParsing;
 
+use Exception;
 use PHPUnit\Framework\TestCase;
 use WMDE\VueJsTemplating\JsParsing\BasicJsExpressionParser;
 
@@ -116,4 +117,49 @@ class BasicJsExpressionParserTest extends TestCase {
 			"wikibase-mex-icon-collapse-x-small" => false
 		], $result );
 	}
+
+	public function testCanParse_boolean_literal(): void {
+		$jsExpressionEvaluator = new BasicJsExpressionParser( [] );
+
+		$parsedExpression = $jsExpressionEvaluator->parse( "false" );
+		$result = $parsedExpression->evaluate( [] );
+
+		$this->assertFalse( $result );
+	}
+
+	public function testCanParseBinaryExpression_withBools(): void {
+		$jsExpressionEvaluator = new BasicJsExpressionParser( [] );
+
+		$parsedExpression = $jsExpressionEvaluator->parse( "false != true" );
+		$result = $parsedExpression->evaluate( [] );
+
+		$this->assertTrue( $result );
+	}
+
+	public function testCanParseBinaryExpression_withNumbers(): void {
+		$jsExpressionEvaluator = new BasicJsExpressionParser( [] );
+
+		$parsedExpression = $jsExpressionEvaluator->parse( "3 < 4" );
+		$result = $parsedExpression->evaluate( [] );
+
+		$this->assertTrue( $result );
+	}
+
+	public function testCanParseBinaryExpression_withStrings(): void {
+		$jsExpressionEvaluator = new BasicJsExpressionParser( [] );
+
+		$parsedExpression = $jsExpressionEvaluator->parse( "'this' == 'that'" );
+		$result = $parsedExpression->evaluate( [] );
+
+		$this->assertFalse( $result );
+	}
+
+	public function testParseBinaryExpressionWithComplexValues_throwsError(): void {
+		$jsExpressionEvaluator = new BasicJsExpressionParser( [] );
+		$this->expectException( Exception::class );
+
+		$parsedExpression = $jsExpressionEvaluator->parse( "3 < myvar" );
+		$parsedExpression->evaluate( [ 'myvar' => [ 1, 2, 3 ] ] );
+	}
+
 }
