@@ -139,7 +139,31 @@ class Component {
 		}
 		$rendered = $this->app->renderComponentToDOM( $componentName, $componentData );
 		// TODO use adoptNode() instead of importNode() in PHP 8.3+ (see php-src commit ed6df1f0ad)
-		$node->replaceWith( $node->ownerDocument->importNode( $rendered, true ) );
+		$importNode = $node->ownerDocument->importNode( $rendered, true );
+		// TODO An issue in PHP 8.1.21's libxml integration causes a double-free if we replace a node
+		// directly with itself. T398821
+		if ( $node != $importNode ) {
+			$node->replaceWith( $importNode );
+		} else {
+			// TODO To work around the double-free, we detach all the children of the parent node and
+			// re-attach them in the correct sequence, replacing the target node with our newly-imported
+			// node. Once `mwcli` has moved off this outdated version of PHP (T388411) we should be able
+			// to remove this workaround. T398821
+			$parent = $node->parentNode;
+			$children = [];
+			foreach ( iterator_to_array( $parent->childNodes ) as $child ) {
+				if ( $child !== $node ) {
+					$children[] = $child;
+				} else {
+					$children[] = $importNode;
+				}
+				$child->remove();
+			}
+
+			foreach ( $children as $child ) {
+				$parent->appendChild( $child );
+			}
+		}
 		return true;
 	}
 
