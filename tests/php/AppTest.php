@@ -61,6 +61,16 @@ class AppTest extends TestCase {
 		$this->assertSame( '<div><p>obj = { a: A, b: B }</p></div>', $result );
 	}
 
+	public function testComponentSubstitutionPreservesOrder(): void {
+		$app = new App( [] );
+		$app->registerComponentTemplate( 'root', '<div><x-a></x-a><div><p>Following Text</p></div>' );
+		$app->registerComponentTemplate( 'x-a', '<p>obj = { a: 1, b: 2 }</p>' );
+
+		$result = $app->renderComponent( 'root', [] );
+
+		$this->assertSame( '<div><p>obj = { a: 1, b: 2 }</p><div><p>Following Text</p></div></div>', $result );
+	}
+
 	public function testComponentPropKebabCase(): void {
 		$app = new App( [] );
 		$app->registerComponentTemplate(
