@@ -102,6 +102,15 @@ EOF;
 		$this->assertSame( '<div><div><p>some value</p></div></div>', $result );
 	}
 
+	public function testTemplateWithVhtmlVariableAndAttributeBinding_ReplacesBoth(): void {
+		$result = $this->createAndRender(
+			'<div><div :data-a="a" v-html="html"></div></div>',
+			[ 'a' => 'A', 'html' => '<p>HTML</p>' ]
+		);
+
+		$this->assertSame( '<div><div data-a="A"><p>HTML</p></div></div>', $result );
+	}
+
 	public function testTemplateWithVhtmlAndDiacritcsInValue_ReplacesVariableWithEncodedValue() {
 		$result = $this->createAndRender(
 			'<div><div v-html="value"></div></div>',
