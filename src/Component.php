@@ -319,11 +319,7 @@ class Component {
 			$variableName = $node->getAttribute( 'v-html' );
 			$node->removeAttribute( 'v-html' );
 
-			$newNode = $node->cloneNode( true );
-
-			$this->appendHTML( $newNode, $data[$variableName] );
-
-			$node->parentNode->replaceChild( $newNode, $node );
+			$this->appendHTML( $node, $data[$variableName] );
 		}
 	}
 
