@@ -7,7 +7,7 @@ use RuntimeException;
 class VariableAccess implements ParsedExpression {
 
 	/**
-	 * @var string[]
+	 * @var ParsedExpression[]
 	 */
 	private $pathParts;
 
@@ -24,11 +24,14 @@ class VariableAccess implements ParsedExpression {
 	public function evaluate( array $data ) {
 		$value = $data;
 		foreach ( $this->pathParts as $key ) {
-			if ( !array_key_exists( $key, $value ) ) {
-				$expression = implode( '.', $this->pathParts );
+			$keyValue = $key->evaluate( $data );
+			if ( !array_key_exists( $keyValue, $value ) ) {
+				$expression = implode( '.', array_map(
+					static fn ( $part ) => $part->evaluate( $data ), $this->pathParts
+				) );
 				throw new RuntimeException( "Undefined variable '{$expression}'" );
 			}
-			$value = $value[$key];
+			$value = $value[$keyValue];
 		}
 		return $value;
 	}

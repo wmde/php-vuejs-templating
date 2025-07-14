@@ -255,6 +255,46 @@ EOF;
 		$this->assertSame( '<p><a></a><a></a></p>', $result );
 	}
 
+	public function testTemplateWithForLoopAndMultipleElementsInNestedArrayWithStringKeys_ResolvesVariables() {
+		$result = $this->createAndRender(
+			'<p><a v-for="item in list[\'data-values\']"></a></p>',
+			[ 'list' => [ 'data-values' => [ 1, 2 ] ] ]
+		);
+
+		$this->assertSame( '<p><a></a><a></a></p>', $result );
+	}
+
+	public function testTemplateWithForLoopAndMultipleElementsInNestedIndexedArray_ResolvesVariables() {
+		$result = $this->createAndRender(
+			'<p><a v-for="item in list[1]"></a></p>',
+			[ 'list' => [ [ 3, 4, 5 ], [ 1, 2 ] ] ]
+		);
+
+		$this->assertSame( '<p><a></a><a></a></p>', $result );
+	}
+
+	public function testForVariableIsAvailableForNestedExpressions() {
+		$result = $this->createAndRender(
+			'<div><div v-for="index in indexKeys">' .
+			'<p>{{ data[index] }}</p>' .
+			'</div></div>',
+			[ 'indexKeys' => [ 'index1', 'index2' ],
+			  'data' => [ 'index1' => 1, 'index2' => 2 ] ]
+		);
+		$this->assertSame( '<div><div><p>1</p></div><div><p>2</p></div></div>', $result );
+	}
+
+	public function testForVariableIsAvailableForNestedExpressions_NestedDataAccess() {
+		$result = $this->createAndRender(
+			'<div><div v-for="index in data">' .
+			'<p>{{ indexKeys[index.key] }}</p>' .
+			'</div></div>',
+			[ 'indexKeys' => [ 'value1', 'value2' ],
+			  'data' => [ 'index1' => [ 'key' => 0 ], 'index2' => [ 'key' => 1 ] ] ]
+		);
+		$this->assertSame( '<div><div><p>value1</p></div><div><p>value2</p></div></div>', $result );
+	}
+
 	public function testTemplateWithForLoopMustache_RendersCorrectValues() {
 		$result = $this->createAndRender(
 			'<p><a v-for="item in list">{{item}}</a></p>',

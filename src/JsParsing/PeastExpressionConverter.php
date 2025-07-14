@@ -50,11 +50,15 @@ class PeastExpressionConverter {
 		$parts = [];
 		while ( $expression !== null ) {
 			if ( get_class( $expression ) === MemberExpression::class ) {
-				$property = $expression->getProperty()->getName();
-				array_unshift( $parts, $property );
+				if ( $expression->getComputed() ) {
+					array_unshift( $parts, new ComputedKey( $this->convertExpression( $expression->getProperty() ) ) );
+				} else {
+					$propertyName = $this->convertKeyToLiteral( $expression->getProperty() );
+					array_unshift( $parts, new StringLiteral( $propertyName ) );
+				}
 				$expression = $expression->getObject();
 			} elseif ( get_class( $expression ) === Identifier::class ) {
-				array_unshift( $parts, $expression->getName() );
+				array_unshift( $parts, new StringLiteral( $expression->getName() ) );
 				$expression = null;
 			} else {
 				throw new RuntimeException(
@@ -85,7 +89,7 @@ class PeastExpressionConverter {
 			UnaryExpression::class => $this->convertUnaryExpression( $expression ),
 			MemberExpression::class => $this->convertMemberExpression( $expression ),
 			PeastStringLiteral::class => new StringLiteral( $expression->getValue() ),
-			Identifier::class => new VariableAccess( [ $expression->getName() ] ),
+			Identifier::class => new VariableAccess( [ new StringLiteral( $expression->getName() ) ] ),
 			CallExpression::class => $this->convertCallExpression( $expression ),
 			ObjectExpression::class => $this->convertObjectExpression( $expression ),
 			PeastBooleanLiteral::class => new BooleanLiteral( $expression->getValue() ),
@@ -100,6 +104,7 @@ class PeastExpressionConverter {
 	protected function convertKeyToLiteral( $key ) {
 		return match( get_class( $key ) ) {
 			PeastStringLiteral::class => $key->getValue(),
+			PeastNumericLiteral::class => $key->getValue(),
 			Identifier::class => $key->getName(),
 			default => throw new RuntimeException(
 				'Unable to extract name from dictionary key of type ' . get_class( $key )
