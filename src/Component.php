@@ -316,10 +316,10 @@ class Component {
 
 		/** @var DOMElement $node */
 		if ( $node->hasAttribute( 'v-html' ) ) {
-			$variableName = $node->getAttribute( 'v-html' );
+			$htmlExpression = $node->getAttribute( 'v-html' );
 			$node->removeAttribute( 'v-html' );
 
-			$this->appendHTML( $node, $data[$variableName] );
+			$this->appendHTML( $node, $this->app->evaluateExpression( $htmlExpression, $data ) );
 		}
 	}
 
