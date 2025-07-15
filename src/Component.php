@@ -94,6 +94,40 @@ class Component {
 		return json_encode( $value );
 	}
 
+	private function safeModifyChildren( DOMNode $parent, DOMNode $oldNode, array $newNodes, bool $insert = false ) {
+		// TODO To work around the double-free, we detach all the children of the parent node and
+		// re-attach them in the correct sequence, replacing the target node with our newly-imported
+		// node. Once `mwcli` has moved off this outdated version of PHP (T388411) we should be able
+		// to remove this workaround. T398821
+		$children = [];
+		foreach ( iterator_to_array( $parent->childNodes ) as $child ) {
+			if ( $child === $oldNode ) {
+				$children = array_merge( $children, $newNodes );
+			}
+			if ( $insert || $child !== $oldNode ) {
+				$children[] = $child;
+			}
+			$child->remove();
+		}
+
+		foreach ( $children as $child ) {
+			$parent->appendChild( $child );
+		}
+	}
+
+	private function safeReplaceNode( DOMNode $parent, DOMNode $oldNode, array $newNodes ) {
+		$this->safeModifyChildren( $parent, $oldNode, $newNodes, false );
+	}
+
+	private function safeInsertBefore( DOMNode $parent, DOMNode $oldNode, array $newNodes ) {
+		$this->safeModifyChildren( $parent, $oldNode, $newNodes, true );
+	}
+
+	private function replaceNodeWithChildren( DOMNode $node ) {
+		$children = iterator_to_array( $node->childNodes );
+		$this->safeReplaceNode( $node->parentNode, $node, $children );
+	}
+
 	/**
 	 * @param DOMNode $node
 	 * @param array $data
@@ -145,24 +179,7 @@ class Component {
 		if ( $node != $importNode ) {
 			$node->replaceWith( $importNode );
 		} else {
-			// TODO To work around the double-free, we detach all the children of the parent node and
-			// re-attach them in the correct sequence, replacing the target node with our newly-imported
-			// node. Once `mwcli` has moved off this outdated version of PHP (T388411) we should be able
-			// to remove this workaround. T398821
-			$parent = $node->parentNode;
-			$children = [];
-			foreach ( iterator_to_array( $parent->childNodes ) as $child ) {
-				if ( $child !== $node ) {
-					$children[] = $child;
-				} else {
-					$children[] = $importNode;
-				}
-				$child->remove();
-			}
-
-			foreach ( $children as $child ) {
-				$parent->appendChild( $child );
-			}
+			$this->safeReplaceNode( $node->parentNode, $node, [ $importNode ] );
 		}
 		return true;
 	}
@@ -286,14 +303,18 @@ class Component {
 
 		/** @var DOMElement $node */
 		if ( $node->hasAttribute( 'v-for' ) ) {
+			$parentNode = $node->parentNode;
 			list( $itemName, $listName ) = explode( ' in ', $node->getAttribute( 'v-for' ) );
 			$node->removeAttribute( 'v-for' );
 			$node->removeAttribute( ':key' );
 
 			foreach ( $this->app->evaluateExpression( $listName, $data ) as $item ) {
 				$newNode = $node->cloneNode( true );
-				$node->parentNode->insertBefore( $newNode, $node );
+				$this->safeInsertBefore( $parentNode, $node, [ $newNode ] );
 				$this->handleNode( $newNode, array_merge( $data, [ $itemName => $item ] ) );
+				if ( $newNode->tagName === 'template' ) {
+					$this->replaceNodeWithChildren( $newNode );
+				}
 			}
 
 			$this->removeNode( $node );
@@ -324,7 +345,9 @@ class Component {
 	}
 
 	private function removeNode( DOMElement $node ) {
-		$node->parentNode->removeChild( $node );
+		if ( $node->parentNode ) {
+			$node->parentNode->removeChild( $node );
+		}
 	}
 
 	/**
