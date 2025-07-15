@@ -102,6 +102,15 @@ EOF;
 		$this->assertSame( '<div><div><p>some value</p></div></div>', $result );
 	}
 
+	public function testTemplateWithVhtmlVariableNestedData_ReplacesVariableWithGivenValue() {
+		$result = $this->createAndRender(
+			'<div><div v-html="value.html"></div></div>',
+			[ 'value' => [ 'html' => '<p>some value</p>' ] ]
+		);
+
+		$this->assertSame( '<div><div><p>some value</p></div></div>', $result );
+	}
+
 	public function testTemplateWithVhtmlVariableAndAttributeBinding_ReplacesBoth(): void {
 		$result = $this->createAndRender(
 			'<div><div :data-a="a" v-html="html"></div></div>',
