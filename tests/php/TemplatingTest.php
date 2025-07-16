@@ -255,6 +255,39 @@ EOF;
 		$this->assertSame( '<p><a></a></p>', $result );
 	}
 
+	public function testTemplateWithForLoopUsingTemplateElement_DropsTemplateTags() {
+		$result = $this->createAndRender(
+			'<p><template v-for="item in list">{{ item }}</template></p>',
+			[ 'list' => [ 1, 2 ] ]
+		);
+
+		$this->assertSame( '<p>12</p>', $result );
+	}
+
+	public function testTemplateWithNestedForLoopUsingTemplateElement_DropsTemplateTags() {
+		$result = $this->createAndRender(
+			'<p><template v-for="sublist in list">' .
+			'<template v-for="item in sublist">{{item}}</template></template></p>',
+			[ 'list' => [ [ 1, 2 ], [ 3, 4 ] ] ]
+		);
+
+		$this->assertSame( '<p>1234</p>', $result );
+	}
+
+	public function testTemplateWithForLoopUsingTemplateElement_RendersMultipleChildren() {
+		$result = $this->createAndRender(
+			'<dl><template v-for="item in list">' .
+			'<dt>{{item.dt}}</dt><dd>{{item.dd}}</dd></template></dl>',
+			[ 'list' => [
+				[ 'dt' => 'cat', 'dd' => 'a feline animal' ],
+				[ 'dt' => 'dog', 'dd' => 'a canine animal' ],
+			] ]
+		);
+
+		$this->assertSame( '<dl><dt>cat</dt><dd>a feline animal</dd>' .
+			'<dt>dog</dt><dd>a canine animal</dd></dl>', $result );
+	}
+
 	public function testTemplateWithForLoopAndMemberExpressionForData_RenderedOnce() {
 		$result = $this->createAndRender(
 			'<p><a v-for="item in list.data"></a></p>',
