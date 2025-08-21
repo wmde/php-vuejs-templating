@@ -93,49 +93,56 @@ EOF;
 		$this->assertSame( '<p>한국어</p>', $result );
 	}
 
-	public function testTemplateWithVhtmlVariable_ReplacesVariableWithGivenValue() {
-		$result = $this->createAndRender(
-			'<div><div v-html="value"></div></div>',
-			[ 'value' => '<p>some value</p>' ]
-		);
-
-		$this->assertSame( '<div><div><p>some value</p></div></div>', $result );
+	public static function provideVHtmlValues(): iterable {
+		return [
+			'plain text does not get wrapped' => [
+				'<div v-html="value"></div>',
+				[ 'value' => 'plain text' ],
+				'<div>plain text</div>',
+			],
+			'starting with plain text, containing html tag' => [
+				'<div v-html="value"></div>',
+				[ 'value' => 'beginning text <div>internal div</div> ending text' ],
+				'<div>beginning text <div>internal div</div> ending text</div>',
+			],
+			'variable in child node is replaced' => [
+				'<div><div v-html="value"></div></div>',
+				[ 'value' => '<p>some value</p>' ],
+				'<div><div><p>some value</p></div></div>',
+			],
+			'variable with nested value' => [
+				'<div><div v-html="value.html"></div></div>',
+				[ 'value' => [ 'html' => '<p>some value</p>' ] ],
+				'<div><div><p>some value</p></div></div>'
+			],
+			'template with v-html and attribute binding' => [
+				'<div><div :data-a="a" v-html="html"></div></div>',
+				[ 'a' => 'A', 'html' => '<p>HTML</p>' ],
+				'<div><div data-a="A"><p>HTML</p></div></div>'
+			],
+			'with diacritics in the value' => [
+				'<div><div v-html="value"></div></div>',
+				[ 'value' => '<p>inglés</p>' ],
+				'<div><div><p>inglés</p></div></div>'
+			],
+			'with value in Korean' => [
+				'<div><div v-html="value"></div></div>',
+				[ 'value' => '<p>한국어</p>' ],
+				'<div><div><p>한국어</p></div></div>'
+			]
+		];
 	}
 
-	public function testTemplateWithVhtmlVariableNestedData_ReplacesVariableWithGivenValue() {
-		$result = $this->createAndRender(
-			'<div><div v-html="value.html"></div></div>',
-			[ 'value' => [ 'html' => '<p>some value</p>' ] ]
-		);
-
-		$this->assertSame( '<div><div><p>some value</p></div></div>', $result );
-	}
-
-	public function testTemplateWithVhtmlVariableAndAttributeBinding_ReplacesBoth(): void {
-		$result = $this->createAndRender(
-			'<div><div :data-a="a" v-html="html"></div></div>',
-			[ 'a' => 'A', 'html' => '<p>HTML</p>' ]
-		);
-
-		$this->assertSame( '<div><div data-a="A"><p>HTML</p></div></div>', $result );
-	}
-
-	public function testTemplateWithVhtmlAndDiacritcsInValue_ReplacesVariableWithEncodedValue() {
-		$result = $this->createAndRender(
-			'<div><div v-html="value"></div></div>',
-			[ 'value' => '<p>inglés</p>' ]
-		);
-
-		$this->assertSame( '<div><div><p>inglés</p></div></div>', $result );
-	}
-
-	public function testTemplateWithVhtmlAndValueInKorean_ReplacesVariableWithEncodedValue() {
-		$result = $this->createAndRender(
-			'<div><div v-html="value"></div></div>',
-			[ 'value' => '<p>한국어</p>' ]
-		);
-
-		$this->assertSame( '<div><div><p>한국어</p></div></div>', $result );
+	/**
+	 * @dataProvider provideVHtmlValues
+	 */
+	public function testTemplateWithVHtmlVariable(
+		string $template,
+		array $data,
+		string $expected
+	) {
+		$result = $this->createAndRender( $template, $data );
+		$this->assertSame( $expected, $result );
 	}
 
 	public function testTemplateWithMustacheVariable_VariableIsUndefined_ThrowsException() {

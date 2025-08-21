@@ -323,7 +323,10 @@ class Component {
 
 	private function appendHTML( DOMNode $parent, $source ) {
 		$htmlParser = new HtmlParser();
-		$tmpDoc = $htmlParser->parseHtml( $source );
+
+		// Wrapping $source in a <body> tag prevents the addition of an implied <p> tag when the
+		// $source starts with plain text
+		$tmpDoc = $htmlParser->parseHtml( '<body>' . $source . '</body>' );
 		foreach ( $htmlParser->getBodyElement( $tmpDoc )->childNodes as $node ) {
 			$node = $parent->ownerDocument->importNode( $node, true );
 			$parent->appendChild( $node );
