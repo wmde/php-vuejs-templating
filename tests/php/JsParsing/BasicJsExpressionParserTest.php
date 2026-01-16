@@ -162,4 +162,13 @@ class BasicJsExpressionParserTest extends TestCase {
 		$parsedExpression->evaluate( [ 'myvar' => [ 1, 2, 3 ] ] );
 	}
 
+	public function testCanParseBinaryExpression_withNullLiteral(): void {
+		$jsExpressionEvaluator = new BasicJsExpressionParser( [] );
+
+		$parsedExpression = $jsExpressionEvaluator->parse( "x !== null" );
+		$result = $parsedExpression->evaluate( [ 'x' => [] ] );
+
+		$this->assertTrue( $result );
+	}
+
 }
