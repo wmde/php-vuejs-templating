@@ -10,6 +10,7 @@ use Peast\Syntax\Node\CallExpression;
 use Peast\Syntax\Node\Expression;
 use Peast\Syntax\Node\Identifier;
 use Peast\Syntax\Node\MemberExpression;
+use Peast\Syntax\Node\NullLiteral as PeastNullLiteral;
 use Peast\Syntax\Node\NumericLiteral as PeastNumericLiteral;
 use Peast\Syntax\Node\ObjectExpression;
 use Peast\Syntax\Node\StringLiteral as PeastStringLiteral;
@@ -95,6 +96,7 @@ class PeastExpressionConverter {
 			PeastBooleanLiteral::class => new BooleanLiteral( $expression->getValue() ),
 			PeastNumericLiteral::class => new NumericLiteral( $expression->getValue() ),
 			PeastBinaryExpression::class => $this->convertBinaryExpression( $expression ),
+			PeastNullLiteral::class => new NullLiteral(),
 			default => throw new RuntimeException(
 				'Unable to parse complex expression of type ' . get_class( $expression )
 			)

@@ -27,14 +27,25 @@ class BinaryExpression implements ParsedExpression {
 		$lval = $this->left->evaluate( $data );
 		$rval = $this->right->evaluate( $data );
 		if (
-			!( is_string( $rval ) || is_numeric( $rval ) || is_bool( $rval ) ) ||
-			!( is_string( $lval ) || is_numeric( $lval ) || is_bool( $lval ) )
+			( is_string( $rval ) || is_numeric( $rval ) || is_bool( $rval ) ) &&
+			( is_string( $lval ) || is_numeric( $lval ) || is_bool( $lval ) )
 		) {
-			throw new RuntimeException(
-				'BooleanExpression must compare strings or numbers. Got ' .
-					gettype( $lval ) . ' and ' . gettype( $rval )
-			);
+			return $this->compareScalars( $lval, $rval );
 		}
+		if ( $lval === null || $rval === null ) {
+			return $this->compareNullable( $lval, $rval );
+		}
+		throw new RuntimeException(
+			'BooleanExpression must compare, strings, numbers, bools or null. Got ' .
+			gettype( $lval ) . ' and ' . gettype( $rval )
+		);
+	}
+
+	/**
+	 * @param string|int|float|bool $lval
+	 * @param string|int|float|bool $rval
+	 */
+	private function compareScalars( $lval, $rval ): bool {
 		return match ( $this->operator ) {
 			'===' => $lval === $rval,
 			'==' => $lval == $rval,
@@ -42,7 +53,16 @@ class BinaryExpression implements ParsedExpression {
 			'>' => $lval > $rval,
 			'<=' => $lval <= $rval,
 			'<' => $lval < $rval,
+			'!==' => $lval !== $rval,
 			'!=' => $lval != $rval,
+			default => throw new RuntimeException( 'Unknown operator in BooleanExpression: "' . $this->operator . '"' )
+		};
+	}
+
+	private function compareNullable( $lval, $rval ): bool {
+		return match( $this->operator ) {
+			'===' => $lval === $rval,
+			'!==' => $lval !== $rval,
 			default => throw new RuntimeException( 'Unknown operator in BooleanExpression: "' . $this->operator . '"' )
 		};
 	}
