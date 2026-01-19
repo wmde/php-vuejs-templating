@@ -36,7 +36,7 @@ class BinaryExpression implements ParsedExpression {
 			return $this->compareNullable( $lval, $rval );
 		}
 		throw new RuntimeException(
-			'BooleanExpression must compare, strings, numbers, bools or null. Got ' .
+			'BooleanExpression must compare strings, numbers, bools or null. Got ' .
 			gettype( $lval ) . ' and ' . gettype( $rval )
 		);
 	}
