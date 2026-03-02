@@ -51,6 +51,7 @@ class Component {
 
 		if ( !$this->isTextNode( $node ) ) {
 			$this->stripEventHandlers( $node );
+			$existingChildren = iterator_to_array( $node->childNodes );
 			$this->handleFor( $node, $data );
 			$this->handleRawHtml( $node, $data );
 
@@ -59,7 +60,7 @@ class Component {
 					$this->handleAttributeBinding( $node, $data );
 					$this->handleConditionalNodes( $node->childNodes, $data );
 
-					foreach ( iterator_to_array( $node->childNodes ) as $childNode ) {
+					foreach ( $existingChildren as $childNode ) {
 						$this->handleNode( $childNode, $data );
 					}
 				}
