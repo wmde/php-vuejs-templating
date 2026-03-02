@@ -129,7 +129,22 @@ EOF;
 				'<div><div v-html="value"></div></div>',
 				[ 'value' => '<p>한국어</p>' ],
 				'<div><div><p>한국어</p></div></div>'
-			]
+			],
+			'mustache-like syntax in v-html text value is not evaluated as template expression' => [
+				'<div v-html="value"></div>',
+				[ 'value' => 'text {{P}} text' ],
+				'<div>text {{P}} text</div>',
+			],
+			'mustache-like syntax in v-html html content is not evaluated as template expression' => [
+				'<div v-html="value"></div>',
+				[ 'value' => '<span>{{P}}</span>' ],
+				'<div><span>{{P}}</span></div>',
+			],
+			'mustache-like syntax in html content and is not re-evaluated as template expression' => [
+				'<div>{{A}}</div>',
+				[ 'A' => '{{B}}', 'B' => 'unused' ],
+				'<div>{{B}}</div>',
+			],
 		];
 	}
 
