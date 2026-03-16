@@ -145,6 +145,16 @@ EOF;
 				[ 'A' => '{{B}}', 'B' => 'unused' ],
 				'<div>{{B}}</div>',
 			],
+			'v-if in v-html content is not evaluated' => [
+				'<div v-html="html"></div>',
+				[ 'html' => '<span v-if="false">content</span>' ],
+				'<div><span v-if="false">content</span></div>',
+			],
+			'v-else in v-html content is not evaluated' => [
+				'<div v-html="html"></div>',
+				[ 'html' => '<span v-else="true">content</span>' ],
+				'<div><span v-else="true">content</span></div>',
+			],
 		];
 	}
 
