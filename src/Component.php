@@ -6,7 +6,6 @@ use DOMAttr;
 use DOMCharacterData;
 use DOMElement;
 use DOMNode;
-use DOMNodeList;
 use DOMText;
 use RuntimeException;
 
@@ -58,7 +57,7 @@ class Component {
 			if ( !$this->isRemovedFromTheDom( $node ) ) {
 				if ( !$this->handleComponent( $node, $data ) ) {
 					$this->handleAttributeBinding( $node, $data );
-					$this->handleConditionalNodes( $node->childNodes, $data );
+					$this->handleConditionalNodes( $existingChildren, $data );
 
 					foreach ( $existingChildren as $childNode ) {
 						$this->handleNode( $childNode, $data );
@@ -266,10 +265,10 @@ class Component {
 	}
 
 	/**
-	 * @param DOMNodeList $nodes
+	 * @param array $nodes
 	 * @param array $data
 	 */
-	private function handleConditionalNodes( DOMNodeList $nodes, array $data ) {
+	private function handleConditionalNodes( array $nodes, array $data ) {
 		// Iteration of iterator breaks if we try to remove items while iterating, so defer node
 		// removing until finished iterating.
 		$nodesToRemove = [];
