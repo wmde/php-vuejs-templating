@@ -70,4 +70,54 @@ class HtmlParserTest extends TestCase {
 		$htmlParser->parseHtml( '</p>' );
 	}
 
+	public function testExtractStyleWithLangFromDocument_singleBlock(): void {
+		$htmlParser = new HtmlParser();
+		$document = $htmlParser->parseHtml(
+			'<template><div></div></template><style>.foo { color: red; }</style>'
+		);
+		$this->assertSame(
+			[ [ 'content' => '.foo { color: red; }', 'lang' => 'css' ] ],
+			$htmlParser->extractStyleWithLangFromDocument( $document )
+		);
+	}
+
+	public function testExtractStyleWithLangFromDocument_lessLang(): void {
+		$htmlParser = new HtmlParser();
+		$document = $htmlParser->parseHtml(
+			'<template><div></div></template><style lang="less">@color: red;</style>'
+		);
+		$this->assertSame(
+			[ [ 'content' => '@color: red;', 'lang' => 'less' ] ],
+			$htmlParser->extractStyleWithLangFromDocument( $document )
+		);
+	}
+
+	public function testExtractStyleWithLangFromDocument_multipleBlocks(): void {
+		$htmlParser = new HtmlParser();
+		$document = $htmlParser->parseHtml(
+			'<template><div></div></template><style>.foo { color: red; }</style><style lang="less">@x: 1;</style>'
+		);
+		$this->assertSame( [
+			[ 'content' => '.foo { color: red; }', 'lang' => 'css' ],
+			[ 'content' => '@x: 1;', 'lang' => 'less' ],
+		], $htmlParser->extractStyleWithLangFromDocument( $document ) );
+	}
+
+	public function testExtractStyleWithLangFromDocument_trimsWhitespace(): void {
+		$htmlParser = new HtmlParser();
+		$document = $htmlParser->parseHtml(
+			"<template><div></div></template><style>\n  .foo { color: red; }\n</style>"
+		);
+		$this->assertSame(
+			[ [ 'content' => '.foo { color: red; }', 'lang' => 'css' ] ],
+			$htmlParser->extractStyleWithLangFromDocument( $document )
+		);
+	}
+
+	public function testExtractStyleWithLangFromDocument_returnsEmptyWhenNoStyleBlock(): void {
+		$htmlParser = new HtmlParser();
+		$document = $htmlParser->parseHtml( '<template><div></div></template>' );
+		$this->assertSame( [], $htmlParser->extractStyleWithLangFromDocument( $document ) );
+	}
+
 }

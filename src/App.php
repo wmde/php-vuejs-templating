@@ -23,6 +23,9 @@ class App {
 
 	private $componentSetups = [];
 
+	/** @var array<string array<array{content: string, lang: string}>> */
+	private $componentStyles = [];
+
 	/**
 	 * @param callable[] $methods The available methods.
 	 * The key is the method name, the value is the corresponding callable.
@@ -87,9 +90,21 @@ class App {
 			$rootNode = $this->htmlParser->getRootNode( $document );
 			$component = new Component( $rootNode, $this );
 			$this->components[$componentName] = $component;
+			$this->componentStyles[$componentName] =
+				$this->htmlParser->extractStyleWithLangFromDocument( $document );
 		}
 
 		return $component;
+	}
+
+	/**
+	 * @param string $componentName
+	 *
+	 * @return array<array{content: string, lang: string}>
+	 */
+	public function getComponentStyles( string $componentName ): array {
+		$this->getComponent( $componentName );
+		return $this->componentStyles[$componentName];
 	}
 
 }

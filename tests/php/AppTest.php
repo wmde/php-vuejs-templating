@@ -84,6 +84,26 @@ class AppTest extends TestCase {
 		$this->assertSame( '<div><p>A B C</p><p>X Y Z</p></div>', $result );
 	}
 
+	public function testGetComponentStyles_returnsStyleBlocks(): void {
+		$app = new App( [] );
+		$app->registerComponentTemplate(
+			'root',
+			'<template><div></div></template><style lang="less">@x: red;</style>'
+		);
+
+		$this->assertSame(
+			[ [ 'content' => '@x: red;', 'lang' => 'less' ] ],
+			$app->getComponentStyles( 'root' )
+		);
+	}
+
+	public function testGetComponentStyles_returnsEmptyWhenNoStyleBlock(): void {
+		$app = new App( [] );
+		$app->registerComponentTemplate( 'root', '<template><div></div></template>' );
+
+		$this->assertSame( [], $app->getComponentStyles( 'root' ) );
+	}
+
 	public function testComputedProperties(): void {
 		$app = new App( [] );
 
