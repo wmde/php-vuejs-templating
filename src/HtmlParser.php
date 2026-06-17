@@ -156,6 +156,23 @@ class HtmlParser {
 	}
 
 	/**
+	 * Extract the CSS/LESS content and language of all <style> blocks from an already-parsed document.
+	 *
+	 * @param DOMDocument $document Parsed content of a .vue SFC file
+	 * @return array<array{content: string, lang: string}> One entry per <style> block; empty if none
+	 */
+	public function extractStyleWithLangFromDocument( DOMDocument $document ): array {
+		$styles = [];
+		foreach ( $document->getElementsByTagName( 'style' ) as $element ) {
+			$styles[] = [
+				'content' => trim( $element->textContent ),
+				'lang' => $element->getAttribute( 'lang' ) ?: 'css',
+			];
+		}
+		return $styles;
+	}
+
+	/**
 	 * Get the only “substantial” child of the given element.
 	 * Ignore any adjacent comments or whitespace-only text nodes
 	 * (such as line breaks or indentation).
